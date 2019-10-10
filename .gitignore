@@ -126,7 +126,9 @@ dmypy.json
 # PyCharm
 .idea/
 
+# Big input files
+dataset/small/
+dataset/full/
+
 # Output files
-output/*_qini.json
-output/*_val_sel.json
-output/tf
+output/
