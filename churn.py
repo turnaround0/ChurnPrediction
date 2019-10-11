@@ -5,7 +5,8 @@ import warnings
 from pandas.core.common import SettingWithCopyWarning
 
 from dataset.dataset import load_data
-from features import tasks, temporal, freq, know
+from features import tasks, temporal, freq
+from analysis.analysis import plot_figure2
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -84,8 +85,10 @@ def main():
     end_time = time.time()
     print('Grouping time:', end_time - start_time)
 
-    a = know.getRepOfAcceptedAnswerer(users_df, posts_df)
-    print(a)
+    # a = know.getRepOfAcceptedAnswerer(users_df, posts_df)
+    # print(a)
+
+    plot_figure2(users_df, posts_df, posts_group)
 
 
 if __name__ == '__main__':
