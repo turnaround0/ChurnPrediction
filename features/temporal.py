@@ -1,5 +1,4 @@
 import pandas as pd
-from features import tasks
 
 
 # Temporal features 1: gap1
@@ -32,4 +31,6 @@ def getTimeSinceLastPost(posts_group, end_date):
 
 # Temporal features 5: mean_gap
 def getTimeMeanGap(posts):
-    return
+    gap_posts = posts[['gap', 'OwnerUserId']]
+    gap_posts = gap_posts[gap_posts.gap != 0]
+    return gap_posts.groupby('OwnerUserId').mean()
