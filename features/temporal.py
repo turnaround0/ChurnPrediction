@@ -10,11 +10,12 @@ def getTimeGap1OfUser(posts_group):
 
 # Temporal features 2: gapK
 def getTimeGapsOfPosts(posts_group, K):
-    posts_group_k_minus_1 = posts_group.nth(K - 1)
     posts_group_k = posts_group.nth(K)
-
-    gap_k = (posts_group_k.CreationDate - posts_group_k_minus_1.CreationDate).dropna()
-    return gap_k
+    return posts_group_k.gap
+    # posts_group_k_minus_1 = posts_group.nth(K - 1)
+    # posts_group_k = posts_group.nth(K)
+    # gap_k = (posts_group_k.CreationDate - posts_group_k_minus_1.CreationDate).dropna() / pd.Timedelta('1 hour')
+    # return gap_k
 
 
 # Temporal features 3: last_gap
