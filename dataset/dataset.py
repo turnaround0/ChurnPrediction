@@ -39,6 +39,7 @@ def post_preprocess(df, user_df):
     df.Id = df.Id.astype('int64')
     df = df.dropna(subset=['OwnerUserId'])
     df.OwnerUserId = df.OwnerUserId.astype('int64')
+    df.PostTypeId = df.PostTypeId.astype('int64')
     df.AnswerCount = df.AnswerCount.fillna(0).astype('int64')
     df.CommentCount = df.CommentCount.fillna(0).astype('int64')
 
@@ -47,9 +48,13 @@ def post_preprocess(df, user_df):
     df = df.merge(user_s.rename('CreationDateOfOwner'), how='left', left_on='OwnerUserId', right_on='Id')
 
     df['BodyLen'] = df.Body.str.len()
-    df.drop(['Body'], axis=1)
     df['gap'] = get_gap(df)
+    df['Question'] = 0
+    df.loc[df.PostTypeId == 1, 'Question'] = 1
+    df['Answer'] = 0
+    df.loc[df.PostTypeId == 2, 'Answer'] = 1
 
+    df = df.drop(['Body', 'PostTypeId'], axis=1)
     return df
 
 
@@ -65,8 +70,17 @@ def load_from_pkl(pkl_file_path):
 def xml2df(xml_path):
     # Read xml file and transform to pandas dataframe
     with open(xml_path, 'r', encoding='UTF8') as f:
-        data = f.read()
-
+        data = ''
+        n_try = 0
+        while True:
+            print('Read Try:', n_try)
+            n_try += 1
+            c = f.read(64 * 1024 * 1024)
+            if not c:
+                break
+            else:
+                data += c
+        #data = f.read()
         xml_dict = xmltodict.parse(data)
         key = list(xml_dict.keys())[0]
 
