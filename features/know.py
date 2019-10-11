@@ -1,6 +1,7 @@
 # Knowledge features 1: accepted_answerer_rep
 def getRepOfAcceptedAnswerer(users, posts):
-    return
+    users_accepted = posts.AcceptedAnswerId.dropna().drop_duplicates().astype('int64')
+    return users.loc[users_accepted, 'Reputation'].dropna()
 
 # Knowledge features 2: max_rep_answerer
 def getMaxRepAmongAnswerer(users, posts):
