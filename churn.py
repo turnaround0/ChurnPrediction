@@ -5,7 +5,7 @@ import warnings
 from pandas.core.common import SettingWithCopyWarning
 
 from dataset.dataset import load_data
-from features import tasks, temporal, freq
+from features import tasks, temporal, freq, know
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -41,6 +41,23 @@ def test_temporal(users_df, posts_df, posts_group):
     d = temporal.getTimeSinceLastPost(posts_group, '2012-07-31')
     print(d)
 
+    e = temporal.getTimeMeanGap(posts_df)
+    print(e)
+
+
+def test_freq(users_df, posts_df, posts_group):
+    a = freq.getNumAnswers(posts_group)
+    print(a)
+
+    b = freq.getNumQuestions(posts_group)
+    print(b)
+
+    c = freq.getAnsQuesRatio(a, b)
+    print(c)
+
+    d = freq.getNumPosts(posts_group)
+    print(d)
+
 
 def main():
     parser = argparse.ArgumentParser(description='***** Churn prediction *****')
@@ -67,7 +84,7 @@ def main():
     end_time = time.time()
     print('Grouping time:', end_time - start_time)
 
-    a = freq.getNumAnswers(posts_group)
+    a = know.getRepOfAcceptedAnswerer(users_df, posts_df)
     print(a)
 
 
