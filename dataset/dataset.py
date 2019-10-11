@@ -7,7 +7,6 @@ def user_preprocess(df):
     # Drop unused columns and change column types
     df = df[['Id', 'Reputation', 'CreationDate', 'LastAccessDate']]
 
-    df.CreationDate = pd.to_datetime(df.CreationDate)
     df.LastAccessDate = pd.to_datetime(df.LastAccessDate)
     df.Id = df.Id.astype('int64')
     df.Reputation = df.Reputation.astype('int64')
@@ -17,10 +16,26 @@ def user_preprocess(df):
     return df
 
 
-def post_preprocess(df, user_df):
-    df = df[['Id', 'CreationDate', 'AcceptedAnswerId', 'Score', 'OwnerUserId', 'AnswerCount', 'CommentCount']]
+def get_gap(df):
+    df = df[['OwnerUserId', 'CreationDate']]
+    df['gap'] = 0
+    df_group = df.groupby('OwnerUserId')
 
-    df.CreationDate = pd.to_datetime(df.CreationDate)
+    for key in df_group.groups:
+        prev_date = pd.Timedelta(0)
+        for group in df_group.groups[key]:
+            if prev_date == pd.Timedelta(0):
+                prev_date = df.loc[group].CreationDate
+            else:
+                gap = df.loc[group].CreationDate - prev_date
+                df.loc[group, 'gap'] = gap / pd.Timedelta('1 hour')
+                prev_date = df.loc[group].CreationDate
+    return df.gap
+
+def post_preprocess(df, user_df):
+    df = df[['Id', 'PostTypeId', 'CreationDate', 'AcceptedAnswerId',
+             'Score', 'OwnerUserId', 'AnswerCount', 'CommentCount', 'Body']]
+
     df.Id = df.Id.astype('int64')
     df = df.dropna(subset=['OwnerUserId'])
     df.OwnerUserId = df.OwnerUserId.astype('int64')
@@ -30,6 +45,10 @@ def post_preprocess(df, user_df):
     df = df.set_index('Id')
     user_s = user_df['CreationDate']
     df = df.merge(user_s.rename('CreationDateOfOwner'), how='left', left_on='OwnerUserId', right_on='Id')
+
+    df['BodyLen'] = df.Body.str.len()
+    df.drop(['Body'], axis=1)
+    df['gap'] = get_gap(df)
 
     return df
 
@@ -78,13 +97,14 @@ def load_data(dataset_type, start_time, end_time):
 
             df = xml2df(xml_file_path)
 
+            # Cut dataset by given period
+            df.CreationDate = pd.to_datetime(df.CreationDate)
+            df = df[(df.CreationDate >= start_time) & (df.CreationDate <= end_time)]
+
             if dataset_name == 'Posts':
                 df = post_preprocess(df, df_list[0])
             else:
                 df = user_preprocess(df)
-
-            # Cut dataset by given period
-            df = df[(df['CreationDate'] >= start_time) & (df['CreationDate'] <= end_time)]
 
             # save_to_pkl(df, pkl_file_path)
             df_list.append(df)
