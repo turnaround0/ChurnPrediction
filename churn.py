@@ -5,27 +5,27 @@ import warnings
 from pandas.core.common import SettingWithCopyWarning
 
 from dataset.dataset import load_data
-from features import tasks, temporal, freq
+from features import pre, apply, tasks, temporal, freq
 from analysis.analysis import plot_figure2
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
-def test_tasks(users_df, posts_df, posts_group):
-    a = tasks.getTask1Posts(posts_group, K=5)
+def test_tasks(users_df, posts_df):
+    a = tasks.getTask1Posts(posts_df, K=5)
     print(a)
 
-    b = tasks.getTask1Users(users_df, posts_group, K=5)
+    b = tasks.getTask1Users(users_df, posts_df, K=5)
     print(b)
 
-    c = tasks.getTask2Posts(users_df, posts_df, posts_group, T=30)
+    c = tasks.getTask2Posts(users_df, posts_df, T=30)
     print(c)
 
-    d = tasks.getTask1Labels(users_df, posts_group, K=5)
+    d = tasks.getTask1Labels(users_df, posts_df, K=5)
     print(d)
 
-    e = tasks.getTask2Labels(users_df, posts_df, posts_group, T=30)
+    e = tasks.getTask2Labels(users_df, posts_df, T=30)
     print(e)
 
 
@@ -70,25 +70,37 @@ def main():
     start_time = time.time()
 
     # You should extract the dataset for the period of the dataset: July 31, 2008 ~  July 31, 2012
-    users_df, posts_df = load_data('tiny', '2008-07-31', '2012-07-31')
+    users_df, posts_df = load_data('tiny')
 
     end_time = time.time()
     print('Loading dataset time:', end_time - start_time)
 
-    # Grouping posts dataframe by user id
-    start_time = time.time()
+    pre.apply_to_users(users_df, posts_df)
+    pre.apply_to_posts(users_df, posts_df)
 
-    # Get posts group by user id
-    # Group should be reused for avoiding regenerating the group.
-    posts_group = posts_df.groupby('OwnerUserId')
+    users_of_task1, posts_of_task1 = apply.apply_task1(users_df, posts_df)
 
-    end_time = time.time()
-    print('Grouping time:', end_time - start_time)
+    print(users_of_task1)
+    print(posts_of_task1)
+
+    features_of_task1 = apply.apply_pre_features_of_task1(users_of_task1, posts_df)
+    print(features_of_task1)
+
+    users_of_task2, posts_of_task2 = apply.apply_task2(users_df, posts_df)
+
+    print(users_of_task2)
+    print(posts_of_task2)
+
+    features_of_task2 = apply.apply_pre_features_of_task2(users_of_task2, posts_df)
+    print(features_of_task2)
+
+    print(posts_of_task1[5])
+    print(posts_of_task2[15])
 
     # a = know.getRepOfAcceptedAnswerer(users_df, posts_df)
     # print(a)
 
-    plot_figure2(users_df, posts_df, posts_group)
+    # plot_figure2(users_df, posts_df, posts_group)
 
 
 if __name__ == '__main__':
