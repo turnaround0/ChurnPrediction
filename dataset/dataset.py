@@ -42,6 +42,15 @@ def posts_preprocess(df, user_df):
     return df.drop(['PostTypeId', 'Body'], axis=1)
 
 
+def set_posts_ith(posts):
+    posts = posts.sort_values(by=['OwnerUserId', 'CreationDate']).reset_index()
+    posts['ithRow'] = posts.index
+    first_posts = posts.groupby('OwnerUserId').first()
+    tmp_posts = posts.merge(first_posts, on='OwnerUserId')
+    posts['ith'] = tmp_posts.ithRow_x - tmp_posts.ithRow_y + 1
+    return posts.drop(['ithRow'], axis=1)
+
+
 # Save and Load dataframe
 def save_to_pkl(df, pkl_file_path):
     df.to_pickle(pkl_file_path)
@@ -64,7 +73,7 @@ def xml2df(xml_path):
     return df
 
 
-def load_data(dataset_type, start_time, end_time):
+def load_data(dataset_type):
     data_paths = {
         'tiny': 'dataset/tiny/',
         'small': 'dataset/small/',
@@ -84,13 +93,21 @@ def load_data(dataset_type, start_time, end_time):
             df = xml2df(xml_file_path)
 
             # Cut dataset by given period
-            start_time = pd.to_datetime(start_time)
-            end_time = pd.to_datetime(end_time)
+            # In case user, it should be ended 6 months earlier due to check churn.
+            start_time = pd.to_datetime('2008-07-31')
+            if dataset_name == 'Posts':
+                end_time = pd.to_datetime('2012-07-31')
+            else:
+                if dataset_type == 'tiny':  # tiny dataset doesn't have matched user data
+                    end_time = pd.to_datetime('2012-07-31')
+                else:
+                    end_time = pd.to_datetime('2012-01-31')
             df.CreationDate = pd.to_datetime(df.CreationDate)
             df = df[(df.CreationDate >= start_time) & (df.CreationDate <= end_time)]
 
             if dataset_name == 'Posts':
                 df = posts_preprocess(df, df_list[0])
+                df = set_posts_ith(df)
             else:
                 df = users_preprocess(df)
 
