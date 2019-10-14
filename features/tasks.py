@@ -4,13 +4,15 @@ import pandas as pd
 # Dataset in Task 1
 #   Posts: Extract K posts of each user
 def getTask1Posts(posts, K=20):
-    return posts.groupby('OwnerUserId').nth(K)
+    posts_k = posts.groupby('OwnerUserId').nth(K)
+    return posts_k
 
 
 #   Users: Extract users who post at least K
 def getTask1Users(users, posts, K=20):
     kth_posts = getTask1Posts(posts, K)
-    return users[users.index.isin(kth_posts.index)]
+    users_k = users[users.index.isin(kth_posts.index)]
+    return users_k
 
 
 # Dataset in Task 2
@@ -19,7 +21,8 @@ def getTask1Users(users, posts, K=20):
 def getTask2Posts(users, posts, T=30):
     users = getTask1Users(users, posts, K=1)
     posts = posts[posts.OwnerUserId.isin(users.index)]
-    return posts[(posts.CreationDate - posts.CreationDateOfOwner).dt.days <= T]
+    posts_t = posts[(posts.CreationDate - posts.CreationDateOfOwner).dt.days <= T]
+    return posts_t
 
 
 # Churn in Task 1
@@ -57,5 +60,4 @@ def getTask2Labels(users, posts, T=30):
 
     label_df['is_churn'] = 1.0
     label_df.loc[num_new_posts.index] = 0.0
-
     return label_df
