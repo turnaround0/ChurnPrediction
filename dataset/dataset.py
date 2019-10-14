@@ -95,10 +95,14 @@ def load_data(dataset_type):
             # Cut dataset by given period
             # In case user, it should be ended 6 months earlier due to check churn.
             start_time = pd.to_datetime('2008-07-31')
-            if dataset_name == 'Posts':
-                end_time = pd.to_datetime('2012-07-31')
+            if dataset_type == 'tiny':
+                # tiny dataset doesn't have before 2012-01-31 user data.
+                if dataset_name == 'Posts':
+                    end_time = pd.to_datetime('2013-07-31')
+                else:
+                    end_time = pd.to_datetime('2013-01-31')
             else:
-                if dataset_type == 'tiny':  # tiny dataset doesn't have matched user data
+                if dataset_name == 'Posts':
                     end_time = pd.to_datetime('2012-07-31')
                 else:
                     end_time = pd.to_datetime('2012-01-31')
