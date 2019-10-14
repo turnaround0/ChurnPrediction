@@ -48,7 +48,7 @@ def set_posts_ith(posts):
     first_posts = posts.groupby('OwnerUserId').first()
     tmp_posts = posts.merge(first_posts, on='OwnerUserId')
     posts['ith'] = tmp_posts.ithRow_x - tmp_posts.ithRow_y + 1
-    return posts.drop(['ithRow'], axis=1)
+    return posts.drop(['ithRow'], axis=1).set_index('Id', drop=True)
 
 
 # Save and Load dataframe
