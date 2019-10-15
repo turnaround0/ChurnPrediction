@@ -5,11 +5,19 @@ def preprocessForKnowledgeFeaturesForTask1(users, posts, all_posts):
     all_answers = all_posts[all_posts.Answer == 1].reset_index()
     all_questions = all_posts[all_posts.Question == 1].reset_index()
 
+    questions = questions.rename(columns={'OwnerUserId': 'QuestionUserId'})[['QuestionUserId', 'Id']]
+    answers = answers.rename(columns={'OwnerUserId': 'AnswerUserId'})[['AnswerUserId', 'ParentId']]
+    anq = answers.merge(questions, how='inner', left_on='ParentId', right_on='Id')
+    anq_users = anq.merge(users[['Reputation']], how='inner', left_on='AnswerUserId', right_on='Id')
+
+    result = anq_users.groupby('QuestionUserId').Reputation.max()
+
+    print(result)
+    assert()
+
+
     qnta = all_answers.set_index('ParentId').join(questions, how='inner', lsuffix='A', rsuffix='Q')
     tqna = answers.set_index('ParentId').join(all_questions, how='inner', lsuffix='A', rsuffix='Q')
-
-    print(qnta)
-    assert()
 
     return answers, questions, qnta, tqna
 
@@ -47,7 +55,6 @@ def getRepOfAcceptedAnswerer2(users, answers, questions, qnta, tqna):
 
 # Knowledge features 2: max_rep_answerer
 def getMaxRepAmongAnswerer(users, answers, questions, qnta, tqna):
-
     rep_max_ans = qnta.set_index('OwnerUserIdA').join(users.Reputation, how='inner')\
         .groupby('OwnerUserIdQ').Reputation.max()
     print(rep_max_ans)
