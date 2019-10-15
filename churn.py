@@ -5,59 +5,11 @@ import warnings
 from pandas.core.common import SettingWithCopyWarning
 
 from dataset.dataset import load_data, store_features
-from features import pre, apply, tasks, temporal, freq
+from features import pre, apply
 from analysis import analysis
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
-
-
-def test_tasks(users_df, posts_df):
-    a = tasks.getTask1Posts(posts_df, K=5)
-    print(a)
-
-    b = tasks.getTask1Users(users_df, posts_df, K=5)
-    print(b)
-
-    c = tasks.getTask2Posts(users_df, posts_df, T=30)
-    print(c)
-
-    d = tasks.getTask1Labels(users_df, posts_df, K=5)
-    print(d)
-
-    e = tasks.getTask2Labels(users_df, posts_df, T=30)
-    print(e)
-
-
-def test_temporal(users_df, posts_df, posts_group):
-    a = temporal.getTimeGap1OfUser(posts_group)
-    print(a)
-
-    b = temporal.getTimeGapsOfPosts(posts_group, 3)
-    print(b)
-
-    c = temporal.getTimeLastGapOfPosts(posts_group)
-    print(c)
-
-    d = temporal.getTimeSinceLastPost(posts_group, '2012-07-31')
-    print(d)
-
-    e = temporal.getTimeMeanGap(posts_df)
-    print(e)
-
-
-def test_freq(users_df, posts_df, posts_group):
-    a = freq.getNumAnswers(posts_group)
-    print(a)
-
-    b = freq.getNumQuestions(posts_group)
-    print(b)
-
-    c = freq.getAnsQuesRatio(a, b)
-    print(c)
-
-    d = freq.getNumPosts(posts_group)
-    print(d)
 
 
 def main():
@@ -98,8 +50,7 @@ def main():
     apply.apply_knowledge_features_of_task1(features_of_task1, users_of_task1, posts_of_task1, posts_df)
     apply.apply_knowledge_features_of_task2(features_of_task2, users_of_task2, posts_of_task2)
 
-    analysis.plot_figure4(features_of_task1)
-
+    # analysis.plot_figure4(features_of_task1)
     # store_features(features_of_task1, features_of_task2)
 
 
