@@ -1,4 +1,4 @@
-from features import temporal, tasks
+from features import temporal, tasks, freq
 
 
 def getFeatures(features, users, posts, task, K=None, T=None):
@@ -70,3 +70,26 @@ def apply_temporal_features_for_task2(features_of_task2, users_of_task2, posts_o
         # features_of_task2[T]['last_gap'] = temporal.getTimeLastGapOfPosts(posts).fillna(0)
         features_of_task2[T]['time_since_last_post'] = temporal.getTimeSinceLastPost(users, posts, T)
         features_of_task2[T]['mean_gap'] = temporal.getTimeMeanGap(posts)
+
+
+def apply_frequency_features_of_task1(features_of_task1, users_of_task1, posts_of_task1):
+    list_of_K = range(1, 21)
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        features_of_task1[K]['num_answers'] = freq.getNumAnswers(posts)
+        features_of_task1[K]['num_questions'] = freq.getNumQuestions(posts)
+        features_of_task1[K] = features_of_task1[K].fillna({'num_answers': 0, 'num_questions': 0})
+        features_of_task1[K]['ans_que_ratio'] = \
+            freq.getAnsQuesRatio(features_of_task1[K]['num_answers'], features_of_task1[K]['num_questions'])
+
+
+def apply_frequency_features_of_task2(features_of_task2, users_of_task2, posts_of_task2):
+    list_of_T = [7, 15, 30]
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['num_answers'] = freq.getNumAnswers(posts)
+        features_of_task2[T]['num_questions'] = freq.getNumQuestions(posts)
+        features_of_task2[T] = features_of_task2[T].fillna({'num_answers': 0, 'num_questions': 0})
+        features_of_task2[T]['ans_que_ratio'] = \
+            freq.getAnsQuesRatio(features_of_task2[T]['num_answers'], features_of_task2[T]['num_questions'])
+        features_of_task2[T]['num_posts'] = freq.getNumPosts(posts)
