@@ -132,11 +132,26 @@ def plot_figure3(features_of_task2):
         plt.show()
 
 
-def plot_figure4():
+def plot_figure4(features_of_task1):
     # Figure 4: K vs Time taken for the first answer to arrive
-    #    The more the time taken for a user to receive an answer,
-    #      the lesser the satisfaction level and the more the chances of churning.
-    pass
+    #  The more the time taken for a user to receive an answer,
+    #  the lesser the satisfaction level and the more the chances of churning.
+    list_of_K = range(1, 21)
+    churners_time = []
+    stayers_time = []
+    for K in list_of_K:
+        subgroup = features_of_task1[K]
+        churners = subgroup[subgroup['is_churn'] == 1][subgroup['time_for_first_ans'] > 0]
+        stayers = subgroup[subgroup['is_churn'] == 0][subgroup['time_for_first_ans'] > 0]
+        churners_time.append(churners['time_for_first_ans'].mean())
+        stayers_time.append(stayers['time_for_first_ans'].mean())
+
+    plt.plot(churners_time, '-o', label='churner')
+    plt.plot(stayers_time, '-o', label='stayer')
+    plt.legend()
+    # plt.axis((0,20,8e3,22e3))
+    plt.show()
+
 
 def plot_table2():
     # Table 2: Performance on Task 1
