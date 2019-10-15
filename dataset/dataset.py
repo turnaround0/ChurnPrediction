@@ -86,6 +86,25 @@ def load_data(dataset_type):
         if os.path.exists(pkl_file_path):
             df_list.append(load_from_pkl(pkl_file_path))
         else:
+            if dataset_type == 'full':
+                pkl_file_path = data_path + dataset_name + '_reduce.pkl'
+                df = load_from_pkl(pkl_file_path)
+
+                start_time = pd.to_datetime('2008-07-31')
+                if dataset_name == 'Posts':
+                    end_time = pd.to_datetime('2012-07-31')
+                else:
+                    end_time = pd.to_datetime('2012-01-31')
+                df = df[(df.CreationDate >= start_time) & (df.CreationDate <= end_time)]
+
+                if dataset_name == 'Posts':
+                    df = df.rename(columns={'BodyWordNum': 'BodyLen'})
+                    df = set_posts_ith(df)
+
+                save_to_pkl(df, pkl_file_path)
+                df_list.append(df)
+                continue
+
             xml_file_path = data_path + dataset_name + '.xml'
             df = xml2df(xml_file_path)
 

@@ -22,8 +22,9 @@ def main():
     # Load from dataset
     start_time = time.time()
 
+    # Full reduce link: https://drive.google.com/drive/folders/1Fp_7GDH_t7xfnU8aXeKrcBC54_nECOcu
     # You should extract the dataset for the period of the dataset: July 31, 2008 ~  July 31, 2012
-    users_df, posts_df = load_data('small')
+    users_df, posts_df = load_data('full')
 
     end_time = time.time()
     print('Loading dataset time:', end_time - start_time)
