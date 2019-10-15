@@ -30,16 +30,13 @@ def posts_preprocess(df, user_df):
     df.AcceptedAnswerId = df.AcceptedAnswerId.fillna(0).astype('int64')
     df.ParentId = df.ParentId.fillna(0).astype('int64')
     df.Score = df.Score.astype('int64')
-    df['Question'] = 0
-    df.loc[df.PostTypeId == 1, 'Question'] = 1
-    df['Answer'] = 0
-    df.loc[df.PostTypeId == 2, 'Answer'] = 1
+    df.PostTypeId = df.PostTypeId.astype('int64')
 
-    df = df.merge(user_df['CreationDate'].rename('CreationDateOfOwner'),
+    df = df.merge(user_df.CreationDate.rename('CreationDateOfOwner'),
                   how='left', left_on='OwnerUserId', right_on='Id')
 
     df = df.set_index('Id')
-    return df.drop(['PostTypeId', 'Body'], axis=1)
+    return df.drop(['Body'], axis=1)
 
 
 def set_posts_ith(posts):
