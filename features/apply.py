@@ -59,3 +59,14 @@ def apply_temporal_features_for_task1(features_of_task1, users_of_task1, posts_o
         features_of_task1[K]['gap1'] = temporal.getTimeGap1OfUser(users_of_task1[K], posts_of_task1[K])
         for k in range(2, K+1):
             features_of_task1[K]['gap{}'.format(k)] = temporal.getTimeGapkOfPosts(posts_of_task1[K], k)
+
+
+def apply_temporal_features_for_task2(features_of_task2, users_of_task2, posts_of_task2):
+    list_of_T = [7, 15, 30]
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['gap1'] = temporal.getTimeGap1OfUser(users, posts)
+        features_of_task2[T]['last_gap'] = temporal.getTimeLastGapOfPosts(posts).fillna(features_of_task2[T]['gap1'])
+        # features_of_task2[T]['last_gap'] = temporal.getTimeLastGapOfPosts(posts).fillna(0)
+        features_of_task2[T]['time_since_last_post'] = temporal.getTimeSinceLastPost(users, posts, T)
+        features_of_task2[T]['mean_gap'] = temporal.getTimeMeanGap(posts)
