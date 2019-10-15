@@ -1,11 +1,11 @@
 # Frequency features 1: num_answers
 def getNumAnswers(posts):
-    return posts[posts.Answer == 1].groupby('OwnerUserId').size()
+    return posts[posts.PostTypeId == 2].groupby('OwnerUserId').size()
 
 
 # Frequency features 2: num_questions
 def getNumQuestions(posts):
-    return posts[posts.Question == 1].groupby('OwnerUserId').size()
+    return posts[posts.PostTypeId == 1].groupby('OwnerUserId').size()
 
 
 # Frequency features 3: ans_ques_ratio
