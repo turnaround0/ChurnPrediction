@@ -70,7 +70,7 @@ def main():
     start_time = time.time()
 
     # You should extract the dataset for the period of the dataset: July 31, 2008 ~  July 31, 2012
-    users_df, posts_df = load_data('tiny')
+    users_df, posts_df = load_data('small')
 
     end_time = time.time()
     print('Loading dataset time:', end_time - start_time)
@@ -84,7 +84,6 @@ def main():
     print(posts_of_task1)
 
     features_of_task1 = apply.apply_pre_features_of_task1(users_of_task1, posts_df)
-    print(features_of_task1)
 
     users_of_task2, posts_of_task2 = apply.apply_task2(users_df, posts_df)
 
