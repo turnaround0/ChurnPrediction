@@ -4,7 +4,66 @@ import matplotlib.pyplot as plt
 
 from features import tasks, temporal
 
-def plot_figure2(users, posts, posts_group):
+
+def plot_figure2(features_of_task1):
+    # Figure 2: Gap between posts
+    #    For a user who churns, gap between consecutive posts keeps increasing.
+    #    Gaps for those who stay are much lower, and stabilize around 20,000 minutes,
+    #    indicating routine posting activity in every ≈2 weeks.
+    list_of_K = range(1, 21)
+    clist = []
+    slist = []
+    for K in list_of_K:
+        subgroup = features_of_task1[K]
+        churners_gap = []
+        stayers_gap = []
+        for i in range(2, K + 1):
+            gapK = 'gap{}'.format(i)
+            sum_gapK = list(subgroup.groupby('is_churn')[gapK].sum())
+            count_gapK = list(subgroup.groupby('is_churn')[gapK].count())
+            if len(sum_gapK) < 2:
+                break
+            churners_gap.append(sum_gapK[1] / count_gapK[1])
+            stayers_gap.append(sum_gapK[0] / count_gapK[0])
+
+        clist.append(churners_gap)
+        slist.append(stayers_gap)
+
+        # print("K={}".format(K))
+        plt.plot(churners_gap, '-o', label='churner')
+        plt.plot(stayers_gap, '-o', label='stayer')
+        plt.legend()
+        plt.axis((0, 20, 0, 15e4))
+        plt.show()
+
+    fig = plt.figure()
+    ax1 = fig.add_subplot(2, 2, 1)
+    ax2 = fig.add_subplot(2, 2, 2)
+    ax3 = fig.add_subplot(2, 2, 3)
+    ax4 = fig.add_subplot(2, 2, 4)
+    axlist = [ax1, ax2, ax3, ax4]
+    for c, s, ax in zip(clist[1:], slist[1:], axlist):
+        ax.plot(c, '-o', label='churner')
+        ax.plot(s, '-o', label='stayer')
+        ax.legend()
+        ax.axis((0, 20, 0, 15e4))
+    plt.show()
+
+    fig = plt.figure()
+    ax1 = fig.add_subplot(2, 2, 1)
+    ax2 = fig.add_subplot(2, 2, 2)
+    ax3 = fig.add_subplot(2, 2, 3)
+    ax4 = fig.add_subplot(2, 2, 4)
+    axlist = [ax1, ax2, ax3, ax4]
+    for c, s, ax in zip(clist[-4:], slist[-4:], axlist):
+        ax.plot(c, '-o', label='churner')
+        ax.plot(s, '-o', label='stayer')
+        ax.legend()
+        ax.axis((0, 20, 0, 15e4))
+    plt.show()
+
+
+def plot_figure2_backup(users, posts, posts_group):
     # Figure 2: Gap between posts
     #    For a user who churns, gap between consecutive posts keeps increasing.
     #    Gaps for those who stay are much lower, and stabilize around 20,000 minutes,
