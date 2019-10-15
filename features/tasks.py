@@ -4,13 +4,13 @@ from pandas.tseries.offsets import DateOffset, Day
 
 # Dataset in Task 1
 #   Posts: Extract K posts of each user
+#   Users: Extract users who post at least K
 def getTask1Posts(posts, K=20):
     user_k_list = posts[posts.ith == K].OwnerUserId.to_list()
     posts_k = posts[posts.OwnerUserId.isin(user_k_list)]
     return posts_k[posts_k.ith <= K]
 
 
-#   Users: Extract users who post at least K
 def getTask1Users(users, posts, K):
     return users[users.numPosts >= K]
 
@@ -28,7 +28,9 @@ def getTask2Users(users, posts):
 
 # Churn in Task 1
 #   Churners: Users who did not post for at least 6 months from their K-th post
+#             creation date of K + 1 post > deadline or no K + 1 post
 #   Stayers:  Users who created at least one post within the 6 months from their K-th post
+#             creation date of K + 1 post <= deadline
 def getTask1Labels(users, posts, K):
     users_valid = posts.OwnerUserId.isin(users.index)
     posts_k = posts[(posts.ith == K) & users_valid][['CreationDate', 'OwnerUserId']]
@@ -39,8 +41,6 @@ def getTask1Labels(users, posts, K):
     posts_k = posts_k.merge(posts_k_next, how='left', on='OwnerUserId')
     posts_k.CreationDate = posts_k.CreationDate.fillna(pd.to_datetime('2100-12-31'))
 
-    # Stayer: creation date of K + 1 post <= deadline
-    # Churner: creation date of K + 1 post > deadline or no K + 1 post
     users['is_churn'] = 0
     users.loc[posts_k[posts_k.CreationDate > posts_k.Deadline].OwnerUserId, 'is_churn'] = 1
     return users
@@ -48,7 +48,9 @@ def getTask1Labels(users, posts, K):
 
 # Churn in Task2
 #   Churners: Users who did not post for at least 6 months from T days after account creation
+#             no creation date of post between deadline T and deadline of churn
 #   Stayers:  Users who created at least one post within the 6 months from T days after account creation
+#             creation date of post between deadline T and deadline of churn
 def getTask2Labels(users, posts, T=30):
     users = users[users.numPosts > 0]
     posts = posts[posts.OwnerUserId.isin(users.index)]
@@ -60,8 +62,6 @@ def getTask2Labels(users, posts, T=30):
     posts_after_t = posts[(posts.CreationDate <= deadline_churn) & (posts.CreationDate > deadline_t) &
                           (posts.OwnerUserId.isin(posts_t_users))]
 
-    # Stayer: creation date of post between deadline T and deadline of churn
-    # Churner: no creation date of post between deadline T and deadline of churn
     users_t = users.loc[posts_t_users]
     users_t['is_churn'] = 1
     users_t.loc[posts_after_t.OwnerUserId, 'is_churn'] = 0
