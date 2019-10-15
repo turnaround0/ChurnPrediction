@@ -80,21 +80,16 @@ def main():
 
     users_of_task1, posts_of_task1 = apply.apply_task1(users_df, posts_df)
 
-    print(users_of_task1)
-    print(posts_of_task1)
-
     features_of_task1 = apply.apply_pre_features_of_task1(users_of_task1, posts_df)
 
     users_of_task2, posts_of_task2 = apply.apply_task2(users_df, posts_df)
 
-    print(users_of_task2)
-    print(posts_of_task2)
-
     features_of_task2 = apply.apply_pre_features_of_task2(users_of_task2, posts_df)
-    print(features_of_task2)
 
-    print(posts_of_task1[5])
-    print(posts_of_task2[15])
+    apply.apply_temporal_features_for_task1(features_of_task1, users_of_task1, posts_of_task1)
+    # plot_figure2(features_of_task1)
+
+    apply.apply_temporal_features_for_task2(features_of_task2, users_of_task2, posts_of_task2)
 
     # a = know.getRepOfAcceptedAnswerer(users_df, posts_df)
     # print(a)
