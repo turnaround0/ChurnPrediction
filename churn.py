@@ -6,7 +6,7 @@ from pandas.core.common import SettingWithCopyWarning
 
 from dataset.dataset import load_data
 from features import pre, apply, tasks, temporal, freq
-from analysis.analysis import plot_figure2
+from analysis import analysis
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -87,14 +87,13 @@ def main():
     features_of_task2 = apply.apply_pre_features_of_task2(users_of_task2, posts_df)
 
     apply.apply_temporal_features_for_task1(features_of_task1, users_of_task1, posts_of_task1)
-    # plot_figure2(features_of_task1)
-
     apply.apply_temporal_features_for_task2(features_of_task2, users_of_task2, posts_of_task2)
+    # analysis.plot_figure2(features_of_task1)
 
-    # a = know.getRepOfAcceptedAnswerer(users_df, posts_df)
-    # print(a)
+    apply.apply_frequency_features_of_task1(features_of_task1, users_of_task1, posts_of_task1)
+    apply.apply_frequency_features_of_task2(features_of_task2, users_of_task2, posts_of_task2)
 
-    # plot_figure2(users_df, posts_df, posts_group)
+    # analysis.plot_figure3(features_of_task2)
 
 
 if __name__ == '__main__':
