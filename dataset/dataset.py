@@ -119,3 +119,17 @@ def load_data(dataset_type):
             df_list.append(df)
 
     return df_list[0], df_list[1]
+
+
+def store_features(features_of_task1, features_of_task2):
+    list_of_K = range(1, 21)
+    list_of_T = [7, 15, 30]
+
+    # Store the whole features of task1 to Google Drive
+    for K in list_of_K:
+        # features_of_task1[K].to_pickle('output/task1_{}posts_features.pkl'.format(K))
+        features_of_task1[K].to_csv('output/task1_{}posts_features.csv'.format(K))
+
+    for T in list_of_T:
+        # features_of_task2[T].to_pickle('output/task2_{}days_features.pkl'.format(T))
+        features_of_task2[T].to_csv('output/task2_{}days_features.csv'.format(T))
