@@ -98,9 +98,14 @@ def load_data(dataset_type):
                 df = df[(df.CreationDate >= start_time) & (df.CreationDate <= end_time)]
 
                 if dataset_name == 'Posts':
+                    df.AnswerCount = df.AnswerCount.fillna(0).astype('int64')
+                    df.CommentCount = df.CommentCount.fillna(0).astype('int64')
+                    df.AcceptedAnswerId = df.AcceptedAnswerId.fillna(0).astype('int64')
+                    df.ParentId = df.ParentId.fillna(0).astype('int64')
                     df = df.rename(columns={'BodyWordNum': 'BodyLen'})
                     df = set_posts_ith(df)
 
+                pkl_file_path = data_path + dataset_name + '.pkl'
                 save_to_pkl(df, pkl_file_path)
                 df_list.append(df)
                 continue
