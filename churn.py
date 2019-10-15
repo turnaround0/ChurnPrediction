@@ -60,7 +60,7 @@ def main():
     train.table2(features_of_task1)
     train.table3(features_of_task2)
     train.figure5(features_of_task1)
-    # train.temporal_feature_analysis(features_of_task1)
+    train.temporal_feature_analysis(features_of_task1)
 
 
 if __name__ == '__main__':

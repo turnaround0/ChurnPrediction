@@ -168,7 +168,8 @@ def temporal_feature_analysis(features_of_task1):
     list_of_K = range(1, 21)
     for K in list_of_K:
         accuracy_with_time_gap = []
-        for name, feature_list in temporal_analysis_feature_func.items():
+        for name, feature_func in temporal_analysis_feature_func.items():
+            feature_list = ['gap{}'.format(j) for j in range(1, K + 1)]
             train_features = [feat for feat in feature_list if feat in features_of_task1[K].columns]
             if len(train_features) == 0:
                 continue
