@@ -7,6 +7,7 @@ from pandas.core.common import SettingWithCopyWarning
 from dataset.dataset import load_data, store_features
 from features import pre, apply
 from analysis import analysis
+from train import train
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -52,6 +53,14 @@ def main():
 
     # analysis.plot_figure4(features_of_task1)
     # store_features(features_of_task1, features_of_task2)
+
+    apply.apply_fill_nan(features_of_task1, features_of_task2)
+
+    train.init()
+    train.table2(features_of_task1)
+    train.table3(features_of_task2)
+    train.figure5(features_of_task1)
+    # train.temporal_feature_analysis(features_of_task1)
 
 
 if __name__ == '__main__':

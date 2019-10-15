@@ -1,3 +1,4 @@
+import numpy as np
 from features import temporal, tasks, freq, know
 
 
@@ -126,3 +127,31 @@ def apply_knowledge_features_of_task2(features_of_task2, users_of_task2, posts_o
         features_of_task2[T]['rep_answerers'] = know.getAvgRepOfAnswerer(users, answers, questions, qna, qna1)
         features_of_task2[T]['rep_co_answerers'] = know.getAvgRepOfCoAnswerer(users, answers, questions, qna, qna1)
         features_of_task2[T]['num_answers_recvd'] = know.getAvgNumAnsReceived(users, answers, questions, qna, qna1)
+
+
+def fill_nan(features):
+    if 'time_for_first_ans' in features.columns and np.isnan(features['time_for_first_ans']).sum(0):
+        features['time_for_first_ans'] = 1 / features['time_for_first_ans']
+        features['time_for_first_ans'] = features['time_for_first_ans'].replace([np.nan], 0)
+    fill_constants = {
+        'accepted_answerer_rep': 0,
+        'max_rep_answerer': 0,
+        'num_que_answered': 0,
+        'rep_questioner': 0,
+        'rep_answerers': 0,
+        'rep_co_answerers': 0,
+        'num_answers_recvd': 0
+    }
+    return features.fillna(fill_constants)
+
+
+def apply_fill_nan(features_of_task1, features_of_task2):
+    list_of_K = range(1, 21)
+    for K in list_of_K:
+        print("Fill NaN of task1(K=", K, ")")
+        features_of_task1[K] = fill_nan(features_of_task1[K])
+
+    list_of_T = [7, 15, 30]
+    for T in list_of_T:
+        print("Fill NaN of task2(T=)", T, ")")
+        features_of_task2[T] = fill_nan(features_of_task2[T])
