@@ -110,7 +110,6 @@ def apply_knowledge_features_of_task1(features_of_task1, users_of_task1, posts_o
         features_of_task1[K]['rep_answerers'] = know.getAvgRepOfAnswerer(users, answers, questions, qnta, tqna)
         features_of_task1[K]['rep_co_answerers'] = know.getAvgRepOfCoAnswerer(users, answers, questions, qnta, tqna)
         features_of_task1[K]['num_answers_recvd'] = know.getAvgNumAnsReceived(users, answers, questions, qnta, tqna)
-        print(features_of_task1[K].accepted_answerer_rep)
 
 
 def apply_knowledge_features_of_task2(features_of_task2, users_of_task2, posts_of_task2):
