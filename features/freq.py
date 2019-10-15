@@ -1,20 +1,19 @@
 # Frequency features 1: num_answers
-def getNumAnswers(posts_group):
-    return posts_group.Answer.sum()
+def getNumAnswers(posts):
+    return posts[posts.Answer == 1].groupby('OwnerUserId').size()
 
 
 # Frequency features 2: num_questions
-def getNumQuestions(posts_group):
-    return posts_group.Question.sum()
+def getNumQuestions(posts):
+    return posts[posts.Question == 1].groupby('OwnerUserId').size()
 
 
 # Frequency features 3: ans_ques_ratio
 def getAnsQuesRatio(num_answers, num_questions):
-    df = num_answers / num_questions
-    df[num_questions == 0] = 0
-    return df
+    # Use Laplace Smoothing
+    return (num_answers + 1) / (num_questions + 1)
 
 
 # Frequency features 4: num_posts
-def getNumPosts(posts_group):
-    return posts_group.size()
+def getNumPosts(posts):
+    return posts.groupby('OwnerUserId').size()
