@@ -1,5 +1,4 @@
-from features.tasks import getTask1Posts, getTask1Users, getTask2Posts, getTask2Users, prepareFeaturesTask1, \
-    prepareFeaturesTask2
+from features import temporal, tasks
 
 
 def getFeatures(features, users, posts, task, K=None, T=None):
@@ -11,24 +10,13 @@ def getFeatures(features, users, posts, task, K=None, T=None):
     return features
 
 
-"""
-task1_features = []
-for K in range(1, 20 + 1):
-    task1_features.append()
-
-task2_features = []
-for T in [7, 15, 30]:
-    task2_features.append()
-"""
-
-
 def apply_task1(users, posts):
     list_of_K = range(1, 21)
     users_of_task1, posts_of_task1 = {}, {}
 
     for K in list_of_K:
-        posts_of_task1[K] = getTask1Posts(posts, K)
-        users_of_task1[K] = getTask1Users(users, posts, K)
+        posts_of_task1[K] = tasks.getTask1Posts(posts, K)
+        users_of_task1[K] = tasks.getTask1Users(users, posts, K)
 
     return users_of_task1, posts_of_task1
 
@@ -38,7 +26,7 @@ def apply_pre_features_of_task1(users_of_task1, posts):
     features_of_task1 = {}
 
     for K in list_of_K:
-        features_of_task1[K] = prepareFeaturesTask1(users_of_task1[K], posts, K)
+        features_of_task1[K] = tasks.getTask1Labels(users_of_task1[K], posts, K)
 
     return features_of_task1
 
@@ -49,8 +37,8 @@ def apply_task2(users, posts):
     posts_of_task2 = {}
 
     for T in list_of_T:
-        posts_of_task2[T] = getTask2Posts(users, posts, T)
-        users_of_task2[T] = getTask2Users(users, posts)
+        posts_of_task2[T] = tasks.getTask2Posts(users, posts, T)
+        users_of_task2[T] = tasks.getTask2Users(users, posts)
 
     return users_of_task2, posts_of_task2
 
@@ -60,6 +48,14 @@ def apply_pre_features_of_task2(users_of_task2, posts):
     features_of_task2 = {}
 
     for T in list_of_T:
-        features_of_task2[T] = prepareFeaturesTask2(users_of_task2[T], posts, T)
+        features_of_task2[T] = tasks.getTask2Labels(users_of_task2[T], posts, T)
 
     return features_of_task2
+
+
+def apply_temporal_features_for_task1(features_of_task1, users_of_task1, posts_of_task1):
+    list_of_K = range(1, 21)
+    for K in list_of_K:
+        features_of_task1[K]['gap1'] = temporal.getTimeGap1OfUser(users_of_task1[K], posts_of_task1[K])
+        for k in range(2, K+1):
+            features_of_task1[K]['gap{}'.format(k)] = temporal.getTimeGapkOfPosts(posts_of_task1[K], k)
