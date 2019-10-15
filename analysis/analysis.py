@@ -102,12 +102,34 @@ def plot_figure2_backup(users, posts, posts_group):
     # plt.show()
 
 
-def plot_figure3():
+def plot_figure3(features_of_task2):
     # Figure 3: # Answers vs Churn probability
     #    The probability of churning for a user decreases the more answers s/he provides.
     #    It is even lower if s/he asks more questions alongside.
-    for features in task2_features:
-        pass
+    min_num_users = 50
+    list_of_T = [7, 15, 30]
+
+    for T in list_of_T:
+        task2 = features_of_task2[T]
+        for num_que_ask in range(5):
+            subgroup = task2[task2['num_questions'] == num_que_ask]
+            churn_probs = []
+            num_answers = list(set(subgroup['num_answers']))
+            num_answers.sort()
+            for num_ans in num_answers:
+                sub_subgroup = subgroup[subgroup['num_answers'] == num_ans]
+                prob = sum(sub_subgroup['is_churn']) / sub_subgroup.shape[0]
+                if sub_subgroup.shape[0] >= min_num_users:
+                    churn_probs.append((num_ans, prob))
+
+            plt.plot([np.log10(x[0] + 1) for x in churn_probs],
+                     [np.log10(x[1] + 0.01) for x in churn_probs],
+                     '-o',
+                     label='{} ques asked'.format(num_que_ask))
+        print("# Answers vs Churn probability")
+        plt.legend()
+        plt.axis((0, 2, -2, 0))
+        plt.show()
 
 
 def plot_figure4():
