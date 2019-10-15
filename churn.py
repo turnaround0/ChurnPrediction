@@ -4,7 +4,7 @@ import argparse
 import warnings
 from pandas.core.common import SettingWithCopyWarning
 
-from dataset.dataset import load_data
+from dataset.dataset import load_data, store_features
 from features import pre, apply, tasks, temporal, freq
 from analysis import analysis
 
@@ -94,6 +94,13 @@ def main():
     apply.apply_frequency_features_of_task2(features_of_task2, users_of_task2, posts_of_task2)
 
     # analysis.plot_figure3(features_of_task2)
+
+    apply.apply_knowledge_features_of_task1(features_of_task1, users_of_task1, posts_of_task1, posts_df)
+    apply.apply_knowledge_features_of_task2(features_of_task2, users_of_task2, posts_of_task2)
+
+    analysis.plot_figure4(features_of_task1)
+
+    # store_features(features_of_task1, features_of_task2)
 
 
 if __name__ == '__main__':
