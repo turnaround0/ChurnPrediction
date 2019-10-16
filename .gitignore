@@ -131,5 +131,4 @@ dataset/small/*.xml
 dataset/full/
 
 # Output files
-output/*.csv
-output/*.png
+output/
