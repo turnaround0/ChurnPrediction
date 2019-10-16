@@ -86,8 +86,10 @@ def temporal_features_of_task2(list_of_T, features_of_task2, users_of_task2, pos
     print('Processing time:', round(end_time - start_time, 8), 's')
 
 
-def apply_frequency_features_of_task1(features_of_task1, users_of_task1, posts_of_task1):
-    list_of_K = range(1, 21)
+def frequency_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Frequency features of task1 ***')
+    start_time = time.time()
+
     for K in list_of_K:
         users, posts = users_of_task1[K], posts_of_task1[K]
         features_of_task1[K]['num_answers'] = freq.getNumAnswers(posts)
@@ -96,9 +98,14 @@ def apply_frequency_features_of_task1(features_of_task1, users_of_task1, posts_o
         features_of_task1[K]['ans_que_ratio'] = \
             freq.getAnsQuesRatio(features_of_task1[K]['num_answers'], features_of_task1[K]['num_questions'])
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
 
-def apply_frequency_features_of_task2(features_of_task2, users_of_task2, posts_of_task2):
-    list_of_T = [7, 15, 30]
+
+def frequency_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Frequency features of task2 ***')
+    start_time = time.time()
+
     for T in list_of_T:
         users, posts = users_of_task2[T], posts_of_task2[T]
         features_of_task2[T]['num_answers'] = freq.getNumAnswers(posts)
@@ -108,15 +115,21 @@ def apply_frequency_features_of_task2(features_of_task2, users_of_task2, posts_o
             freq.getAnsQuesRatio(features_of_task2[T]['num_answers'], features_of_task2[T]['num_questions'])
         features_of_task2[T]['num_posts'] = freq.getNumPosts(posts)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
 
-def apply_knowledge_features_of_task1(features_of_task1, users_of_task1, posts_of_task1, posts_df):
+
+def knowledge_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1, posts_df):
+    print('*** Knowledge features of task1 ***')
+    start_time = time.time()
+
     # Extract knowledge features of task 1
-    list_of_K = range(1, 21)
     for K in list_of_K:
         print("Extract knowledge features of task1(K=", K, ")")
         users, posts = users_of_task1[K], posts_of_task1[K]
         answers, questions, qnta, tqna = know.preprocessForKnowledgeFeaturesForTask1(users, posts, posts_df)
-        features_of_task1[K]['accepted_answerer_rep'] = know.getRepOfAcceptedAnswerer(users, answers, questions, qnta, tqna)
+        features_of_task1[K]['accepted_answerer_rep'] =\
+            know.getRepOfAcceptedAnswerer(users, answers, questions, qnta, tqna)
         features_of_task1[K]['max_rep_answerer'] = know.getMaxRepAmongAnswerer(users, answers, questions, qnta, tqna)
         features_of_task1[K]['num_que_answered'] = know.getNumQueAnswered(users, answers, questions, qnta, tqna)
         features_of_task1[K]['time_for_first_ans'] = know.getTimeForFirstAns(users, answers, questions, qnta, tqna)
@@ -125,14 +138,20 @@ def apply_knowledge_features_of_task1(features_of_task1, users_of_task1, posts_o
         features_of_task1[K]['rep_co_answerers'] = know.getAvgRepOfCoAnswerer(users, answers, questions, qnta, tqna)
         features_of_task1[K]['num_answers_recvd'] = know.getAvgNumAnsReceived(users, answers, questions, qnta, tqna)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
 
-def apply_knowledge_features_of_task2(features_of_task2, users_of_task2, posts_of_task2):
-    list_of_T = [7, 15, 30]
+
+def knowledge_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Knowledge features of task2 ***')
+    start_time = time.time()
+
     for T in list_of_T:
         print("Extract knowledge features of task2(T=)", T, ")")
         users, posts = users_of_task2[T], posts_of_task2[T]
         answers, questions, qna, qna1 = know.preprocessForKnowledgeFeaturesForTask2(users, posts)
-        features_of_task2[T]['accepted_answerer_rep'] = know.getRepOfAcceptedAnswerer(users, answers, questions, qna, qna1)
+        features_of_task2[T]['accepted_answerer_rep'] =\
+            know.getRepOfAcceptedAnswerer(users, answers, questions, qna, qna1)
         features_of_task2[T]['max_rep_answerer'] = know.getMaxRepAmongAnswerer(users, answers, questions, qna, qna1)
         features_of_task2[T]['num_que_answered'] = know.getNumQueAnswered(users, answers, questions, qna, qna1)
         features_of_task2[T]['time_for_first_ans'] = know.getTimeForFirstAns(users, answers, questions, qna, qna1)
@@ -141,11 +160,15 @@ def apply_knowledge_features_of_task2(features_of_task2, users_of_task2, posts_o
         features_of_task2[T]['rep_co_answerers'] = know.getAvgRepOfCoAnswerer(users, answers, questions, qna, qna1)
         features_of_task2[T]['num_answers_recvd'] = know.getAvgNumAnsReceived(users, answers, questions, qna, qna1)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
 
-def fill_nan(features):
-    if 'time_for_first_ans' in features.columns and np.isnan(features['time_for_first_ans']).sum(0):
-        features['time_for_first_ans'] = 1 / features['time_for_first_ans']
-        features['time_for_first_ans'] = features['time_for_first_ans'].replace([np.nan], 0)
+
+def _fill_nan(features):
+    if 'time_for_first_ans' in features.columns and np.isnan(features.time_for_first_ans).sum(0):
+        features.time_for_first_ans = 1 / features.time_for_first_ans
+        features.time_for_first_ans = features.time_for_first_ans.replace([np.nan], 0)
+
     fill_constants = {
         'accepted_answerer_rep': 0,
         'max_rep_answerer': 0,
@@ -158,13 +181,15 @@ def fill_nan(features):
     return features.fillna(fill_constants)
 
 
-def apply_fill_nan(features_of_task1, features_of_task2):
-    list_of_K = range(1, 21)
-    for K in list_of_K:
-        print("Fill NaN of task1(K=", K, ")")
-        features_of_task1[K] = fill_nan(features_of_task1[K])
+def fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2):
+    print('*** Fill NaN ***')
+    start_time = time.time()
 
-    list_of_T = [7, 15, 30]
+    for K in list_of_K:
+        features_of_task1[K] = _fill_nan(features_of_task1[K])
+
     for T in list_of_T:
-        print("Fill NaN of task2(T=)", T, ")")
-        features_of_task2[T] = fill_nan(features_of_task2[T])
+        features_of_task2[T] = _fill_nan(features_of_task2[T])
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
