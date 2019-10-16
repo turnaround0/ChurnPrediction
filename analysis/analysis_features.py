@@ -125,9 +125,6 @@ def plot_figure4(list_of_K, features_of_task1, is_display=False):
         churners_time.append(churners.time_for_first_ans.mean())
         stayers_time.append(stayers.time_for_first_ans.mean())
 
-        print('K:', K)
-        print(subgroup.time_for_first_ans)
-
     fig, ax = plt.subplots()
     ax.set_title('K vs Time taken for the first answer to arrive')
     ax.set_xlabel('Number of observation posts(K)')

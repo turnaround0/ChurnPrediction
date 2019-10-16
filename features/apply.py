@@ -1,6 +1,6 @@
 import time
 import numpy as np
-from features import temporal, tasks, freq, know
+from features import temporal, tasks, freq, know, quality, consistency, speed, gratitude, content, compet
 
 
 def get_users_posts_of_task1(list_of_K, users, posts):
@@ -122,7 +122,6 @@ def knowledge_features_of_task1(list_of_K, features_of_task1, users_of_task1, po
     print('*** Knowledge features of task1 ***')
     start_time = time.time()
 
-    # Extract knowledge features of task 1
     for K in list_of_K:
         print("Extract knowledge features of task1(K=", K, ")")
         users, posts = users_of_task1[K], posts_of_task1[K]
@@ -158,6 +157,158 @@ def knowledge_features_of_task2(list_of_T, features_of_task2, users_of_task2, po
         features_of_task2[T]['rep_answerers'] = know.getAvgRepOfAnswerer(users, answers, questions, qna, qna1)
         features_of_task2[T]['rep_co_answerers'] = know.getAvgRepOfCoAnswerer(users, answers, questions, qna, qna1)
         features_of_task2[T]['num_answers_recvd'] = know.getAvgNumAnsRecvd(users, answers, questions, qna, qna1)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def quality_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Quality features of task1 ***')
+    start_time = time.time()
+
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        features_of_task1[K]['ans_score'] = quality.getScoreOfAnswers(posts)
+        features_of_task1[K]['que_score'] = quality.getScoreOfQuestions(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def quality_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Quality features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['ans_score'] = quality.getScoreOfAnswers(posts)
+        features_of_task2[T]['que_score'] = quality.getScoreOfQuestions(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def consistency_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Consistency features of task1 ***')
+    start_time = time.time()
+
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        features_of_task1[K]['ans_stddev'] = consistency.getStdevOfScoresOfAnswers(posts)
+        features_of_task1[K]['que_stddev'] = consistency.getStdevOfScoresOfQuestions(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def consistency_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Consistency features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['ans_stddev'] = consistency.getStdevOfScoresOfAnswers(posts)
+        features_of_task2[T]['que_stddev'] = consistency.getStdevOfScoresOfQuestions(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def speed_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Speed features of task1 ***')
+    start_time = time.time()
+
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        features_of_task1[K]['answering_speed'] = speed.getAnsweringSpeed(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def speed_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Speed features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['answering_speed'] = speed.getAnsweringSpeed(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def gratitude_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Gratitude features of task1 ***')
+    start_time = time.time()
+
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        features_of_task1[K]['ans_comments'] = gratitude.getAvgNumOfAnswers(posts)
+        features_of_task1[K]['que_comments'] = gratitude.getAvgNumOfQuestions(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def gratitude_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Gratitude features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['ans_comments'] = gratitude.getAvgNumOfAnswers(posts)
+        features_of_task2[T]['que_comments'] = gratitude.getAvgNumOfQuestions(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def competitiveness_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Competitiveness features of task1 ***')
+    start_time = time.time()
+
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        features_of_task1[K]['relative_rank_pos'] = compet.getRelRankPos(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def competitiveness_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Competitiveness features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['relative_rank_pos'] = compet.getRelRankPos(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def content_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Content features of task1 ***')
+    start_time = time.time()
+
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        features_of_task1[K]['ans_comments'] = content.getLengthOfAnswers(posts)
+        features_of_task1[K]['que_comments'] = content.getLengthOfQuestions(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def content_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Content features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['ans_comments'] = content.getLengthOfAnswers(posts)
+        features_of_task2[T]['que_comments'] = content.getLengthOfQuestions(posts)
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')

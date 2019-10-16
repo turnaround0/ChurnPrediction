@@ -1,7 +1,8 @@
 # Quality features 1: ans_score
-# Quality features 2: que_score
 def getScoreOfAnswers(posts):
-    return
+    return posts[posts.PostTypeId == 2].groupby('OwnerUserId').Score.mean()
 
+
+# Quality features 2: que_score
 def getScoreOfQuestions(posts):
-    return
+    return posts[posts.PostTypeId == 1].groupby('OwnerUserId').Score.mean()

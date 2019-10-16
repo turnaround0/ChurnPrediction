@@ -49,6 +49,24 @@ def main():
 
         analysis_features.plot_figure4(list_of_K, features_of_task1, args.d)
 
+        apply.quality_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
+        apply.quality_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
+        apply.consistency_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
+        apply.consistency_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
+        apply.speed_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
+        apply.speed_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
+        apply.gratitude_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
+        apply.gratitude_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
+        apply.competitiveness_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
+        apply.competitiveness_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
+        apply.content_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
+        apply.content_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
         apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
         store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
