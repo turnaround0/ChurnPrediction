@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import xmltodict
 import os.path
@@ -39,6 +40,14 @@ def posts_preprocess(df, user_df):
     return df.drop(['Body'], axis=1)
 
 
+def full_posts_preprocess(df):
+    df.AnswerCount = df.AnswerCount.fillna(0).astype('int64')
+    df.CommentCount = df.CommentCount.fillna(0).astype('int64')
+    df.AcceptedAnswerId = df.AcceptedAnswerId.fillna(0).astype('int64')
+    df.ParentId = df.ParentId.fillna(0).astype('int64')
+    return df.rename(columns={'BodyWordNum': 'BodyLen'})
+
+
 def set_posts_ith(posts):
     posts = posts.sort_values(by=['OwnerUserId', 'CreationDate']).reset_index()
     posts['ithRow'] = posts.index
@@ -70,16 +79,29 @@ def xml2df(xml_path):
     return df
 
 
-def load_data(dataset_type):
+def cut_posts_by_period(dataset_name, df):
+    # You should extract the dataset for the period of the dataset: July31,2008 ~ July31,2012
+    # In case Users, it should be ended 6 months earlier due to check churn.
+    start_time = pd.to_datetime('2008-07-31')
+    end_time = pd.to_datetime('2012-07-31') if dataset_name == 'Posts' else pd.to_datetime('2012-01-31')
+    df = df[(df.CreationDate >= start_time) & (df.CreationDate <= end_time)]
+    return df
+
+
+def load_dataset(dataset_type):
+    # Link: https://archive.org/details/stackexchange
     data_paths = {
-        'tiny': 'dataset/tiny/',
-        'small': 'dataset/small/',
-        'full': 'dataset/full/'
+        'tiny': 'dataset/tiny/',    # academia.meta.stackexchange.com.7z
+        'small': 'dataset/small/',  # math.stackexchange.com.7z
+        'full': 'dataset/full/'     # stackoverflow.com-Users.7z, stackoverflow.com-Posts.7z
     }
     data_path = data_paths[dataset_type]
-
     dataset_names = ['Users', 'Posts']
     df_list = []
+
+    print('*** Loading dataset ***')
+    start_time = time.time()
+
     for dataset_name in dataset_names:
         pkl_file_path = data_path + dataset_name + '.pkl'
 
@@ -87,70 +109,61 @@ def load_data(dataset_type):
             df_list.append(load_from_pkl(pkl_file_path))
         else:
             if dataset_type == 'full':
-                pkl_file_path = data_path + dataset_name + '_reduce.pkl'
-                df = load_from_pkl(pkl_file_path)
-
-                start_time = pd.to_datetime('2008-07-31')
-                if dataset_name == 'Posts':
-                    end_time = pd.to_datetime('2012-07-31')
-                else:
-                    end_time = pd.to_datetime('2012-01-31')
-                df = df[(df.CreationDate >= start_time) & (df.CreationDate <= end_time)]
+                # In case of full dataset, reduced pickle files were given.
+                # Link: https://drive.google.com/drive/folders/1Fp_7GDH_t7xfnU8aXeKrcBC54_nECOcu
+                pkl_file_reduce_path = data_path + dataset_name + '_reduce.pkl'
+                df = load_from_pkl(pkl_file_reduce_path)
+                df = cut_posts_by_period(dataset_name, df)
 
                 if dataset_name == 'Posts':
-                    df.AnswerCount = df.AnswerCount.fillna(0).astype('int64')
-                    df.CommentCount = df.CommentCount.fillna(0).astype('int64')
-                    df.AcceptedAnswerId = df.AcceptedAnswerId.fillna(0).astype('int64')
-                    df.ParentId = df.ParentId.fillna(0).astype('int64')
-                    df = df.rename(columns={'BodyWordNum': 'BodyLen'})
+                    df = full_posts_preprocess(df)
                     df = set_posts_ith(df)
-
-                pkl_file_path = data_path + dataset_name + '.pkl'
-                save_to_pkl(df, pkl_file_path)
-                df_list.append(df)
-                continue
-
-            xml_file_path = data_path + dataset_name + '.xml'
-            df = xml2df(xml_file_path)
-
-            # Cut dataset by given period
-            # In case user, it should be ended 6 months earlier due to check churn.
-            start_time = pd.to_datetime('2008-07-31')
-            if dataset_type == 'tiny':
-                # tiny dataset doesn't have before 2012-01-31 user data.
-                if dataset_name == 'Posts':
-                    end_time = pd.to_datetime('2013-07-31')
                 else:
-                    end_time = pd.to_datetime('2013-01-31')
-            else:
-                if dataset_name == 'Posts':
-                    end_time = pd.to_datetime('2012-07-31')
-                else:
-                    end_time = pd.to_datetime('2012-01-31')
-            df.CreationDate = pd.to_datetime(df.CreationDate)
-            df = df[(df.CreationDate >= start_time) & (df.CreationDate <= end_time)]
+                    df = df.drop([-1])
+            else:   # if small or tiny dataset
+                xml_file_path = data_path + dataset_name + '.xml'
+                df = xml2df(xml_file_path)
+                df.CreationDate = pd.to_datetime(df.CreationDate)
+                df = cut_posts_by_period(dataset_name, df)
 
-            if dataset_name == 'Posts':
-                df = posts_preprocess(df, df_list[0])
-                df = set_posts_ith(df)
-            else:
-                df = users_preprocess(df)
+                if dataset_name == 'Posts':
+                    df = posts_preprocess(df, df_list[0])
+                    df = set_posts_ith(df)
+                else:
+                    df = users_preprocess(df)
 
             save_to_pkl(df, pkl_file_path)
             df_list.append(df)
 
+        print(dataset_name, 'shape:', df_list[-1].shape)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
     return df_list[0], df_list[1]
 
 
-def store_features(features_of_task1, features_of_task2):
-    list_of_K = range(1, 21)
-    list_of_T = [7, 15, 30]
+def store_features(list_of_K, list_of_T, features_of_task1, features_of_task2, file_type='csv'):
+    print('*** Store features ***')
+    print('File type:', file_type)
+    start_time = time.time()
 
-    # Store the whole features of task1 to Google Drive
     for K in list_of_K:
-        # features_of_task1[K].to_pickle('output/task1_{}posts_features.pkl'.format(K))
-        features_of_task1[K].to_csv('output/task1_{}posts_features.csv'.format(K))
+        if file_type == 'csv':
+            features_of_task1[K].to_csv('output/task1_{}posts_features.csv'.format(K))
+        else:
+            features_of_task1[K].to_pickle('output/task1_{}posts_features.pkl'.format(K))
 
     for T in list_of_T:
-        # features_of_task2[T].to_pickle('output/task2_{}days_features.pkl'.format(T))
-        features_of_task2[T].to_csv('output/task2_{}days_features.csv'.format(T))
+        if file_type == 'csv':
+            features_of_task2[T].to_csv('output/task2_{}days_features.csv'.format(T))
+        else:
+            features_of_task2[T].to_pickle('output/task2_{}days_features.pkl'.format(T))
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def preprocess(users, posts):
+    print('*** Preprocess ***')
+    users['numPosts'] = posts.groupby('OwnerUserId').size()
