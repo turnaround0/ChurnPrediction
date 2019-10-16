@@ -120,8 +120,8 @@ def plot_figure4(list_of_K, features_of_task1, is_display=False):
     churners_time, stayers_time = [], []
     for K in list_of_K:
         subgroup = features_of_task1[K]
-        churners = subgroup[subgroup.is_churn == 1][subgroup.time_for_first_ans > 0]
-        stayers = subgroup[subgroup.is_churn == 0][subgroup.time_for_first_ans > 0]
+        churners = subgroup[(subgroup.is_churn == 1) & (subgroup.time_for_first_ans > 0)]
+        stayers = subgroup[(subgroup.is_churn == 0) & (subgroup.time_for_first_ans > 0)]
         churners_time.append(churners.time_for_first_ans.mean())
         stayers_time.append(stayers.time_for_first_ans.mean())
 

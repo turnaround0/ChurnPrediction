@@ -123,7 +123,7 @@ def knowledge_features_of_task1(list_of_K, features_of_task1, users_of_task1, po
     start_time = time.time()
 
     for K in list_of_K:
-        print("Extract knowledge features of task1(K=", K, ")")
+        print("Extract knowledge features of task1( K =", K, ")")
         users, posts = users_of_task1[K], posts_of_task1[K]
         answers, questions, qnta, tqna = know.prepareKnowledgeFeaturesOfTask1(users, posts, posts_df)
         features_of_task1[K]['accepted_answerer_rep'] =\
@@ -145,7 +145,7 @@ def knowledge_features_of_task2(list_of_T, features_of_task2, users_of_task2, po
     start_time = time.time()
 
     for T in list_of_T:
-        print("Extract knowledge features of task2(T=)", T, ")")
+        print("Extract knowledge features of task2( T =", T, ")")
         users, posts = users_of_task2[T], posts_of_task2[T]
         answers, questions, qna, qna1 = know.prepareKnowledgeFeaturesOfTask2(users, posts)
         features_of_task2[T]['accepted_answerer_rep'] =\
