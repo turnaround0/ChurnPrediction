@@ -317,7 +317,7 @@ def content_features_of_task2(list_of_T, features_of_task2, users_of_task2, post
 def _fill_nan(features):
     if 'time_for_first_ans' in features.columns and np.isnan(features.time_for_first_ans).sum(0):
         features.time_for_first_ans = 1 / features.time_for_first_ans
-        features.time_for_first_ans = features.time_for_first_ans.replace([np.nan], 0)
+        features.time_for_first_ans = features.time_for_first_ans.replace([np.nan, np.inf, -np.inf], 0)
 
     # fill_constants = {
     #     'accepted_answerer_rep': 0,
@@ -329,7 +329,7 @@ def _fill_nan(features):
     #     'num_answers_recvd': 0
     # }
     # return features.fillna(fill_constants)
-    return features.fillna(0)
+    return features.replace([np.nan, np.inf, -np.inf], 0)
 
 
 def fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2):
