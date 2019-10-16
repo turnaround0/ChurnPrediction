@@ -28,9 +28,7 @@ def getTask2Users(users, posts):
 
 # Churn in Task 1
 #   Churners: Users who did not post for at least 6 months from their K-th post
-#             creation date of K + 1 post > deadline or no K + 1 post
 #   Stayers:  Users who created at least one post within the 6 months from their K-th post
-#             creation date of K + 1 post <= deadline
 def getTask1Labels(users, posts, K):
     users_valid = posts.OwnerUserId.isin(users.index)
     posts_k = posts[(posts.ith == K) & users_valid][['CreationDate', 'OwnerUserId']]
@@ -42,15 +40,14 @@ def getTask1Labels(users, posts, K):
     posts_k.CreationDate = posts_k.CreationDate.fillna(pd.to_datetime('2100-12-31'))
 
     users['is_churn'] = 0
+    # If creation date of K + 1 post is in deadline, the user is a stayer.
     users.loc[posts_k[posts_k.CreationDate > posts_k.Deadline].OwnerUserId, 'is_churn'] = 1
     return users
 
 
 # Churn in Task2
 #   Churners: Users who did not post for at least 6 months from T days after account creation
-#             no creation date of post between deadline T and deadline of churn
 #   Stayers:  Users who created at least one post within the 6 months from T days after account creation
-#             creation date of post between deadline T and deadline of churn
 def getTask2Labels(users, posts, T=30):
     users = users[users.numPosts > 0]
     posts = posts[posts.OwnerUserId.isin(users.index)]
@@ -64,5 +61,6 @@ def getTask2Labels(users, posts, T=30):
 
     users_t = users.loc[posts_t_users]
     users_t['is_churn'] = 1
+    # If there are posts after T in deadline, the user is a stayer.
     users_t.loc[posts_after_t.OwnerUserId, 'is_churn'] = 0
     return users_t
