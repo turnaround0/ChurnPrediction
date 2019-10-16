@@ -34,7 +34,7 @@ def plot_table4(task1_accuracy_with_time_gap):
     df.to_csv('output/table4.csv')
 
 
-def figure5_of_task1(list_of_K, task1_accuracy_of_category, is_display=False):
+def plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, is_display=False):
     for title, predictions in task1_accuracy_of_category.items():
         if len(predictions) == 0:
             continue
@@ -52,7 +52,7 @@ def figure5_of_task1(list_of_K, task1_accuracy_of_category, is_display=False):
         plt.close(fig)
 
 
-def figure5_of_task2(list_of_T, task2_accuracy_of_category, is_display=False):
+def plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, is_display=False):
     for title, predictions in task2_accuracy_of_category.items():
         if len(predictions) == 0:
             continue
@@ -62,8 +62,8 @@ def figure5_of_task2(list_of_T, task2_accuracy_of_category, is_display=False):
         fig, ax = plt.subplots()
         ax.bar(index, predictions, tick_label=list_of_T, align='center')
         ax.set_title(title)
-        ax.xlim(-1, n_groups)
-        ax.ylim(40, 100)
+        ax.set_xlim(-1, n_groups)
+        ax.set_ylim(50, 80)
         fig.savefig('output/figure5_task2_{}.png'.format(title))
         if is_display:
             plt.show()

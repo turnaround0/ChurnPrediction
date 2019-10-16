@@ -16,12 +16,14 @@ def main():
     parser = argparse.ArgumentParser(description='***** Churn prediction *****')
     parser.add_argument('-d', action='store_true', help='show plots')
     parser.add_argument('-r', action='store_true', help='restore features instead of making them')
+    parser.add_argument('-s', action='store', help='dataset name (tiny, small, full)')
     args = parser.parse_args()
 
     list_of_K = range(1, 21)
     list_of_T = [7, 15, 30]
 
-    users_df, posts_df = load_dataset('small')
+    dataset_name = args.s if args.s else 'small'
+    users_df, posts_df = load_dataset(dataset_name)
     preprocess(users_df, posts_df)
 
     # Featuring from dataset
@@ -80,10 +82,10 @@ def main():
     analysis_train.plot_table3(list_of_T, acc_models)
 
     task1_accuracy_of_category = train.measure_task1_accuracy_of_category(list_of_K, features_of_task1)
-    analysis_train.figure5_of_task1(list_of_K, task1_accuracy_of_category, True)
+    analysis_train.plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
 
-    task2_accuracy_of_category = train.measure_task2_accuracy_of_category(list_of_T, features_of_task1)
-    analysis_train.figure5_of_task2(list_of_T, task2_accuracy_of_category, True)
+    task2_accuracy_of_category = train.measure_task2_accuracy_of_category(list_of_T, features_of_task2)
+    analysis_train.plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
 
     # Training and measure performance on each feature
     task1_accuracy_with_time_gap = train.performance_on_temporal(list_of_K, features_of_task1)

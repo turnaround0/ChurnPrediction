@@ -1,60 +1,17 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 
 import warnings
 
-from analysis.analysis_train import plot_table2
+from train.train_config import training_models, analysis_feature_names, train_seed
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-training_models = {
-    'Decision Tree': DecisionTreeClassifier,
-    # 'SVM (Linear)': LinearSVC,
-    # 'SVM (RBF)': SVC,
-    'Logistic Regression': LogisticRegression,
-}
-
-temporal_features = ['gap1', 'last_gap', 'time_since_last_post', 'mean_gap']
-frequency_features = ['num_answers', 'num_questions',
-                      'ans_que_ratio', 'num_posts']
-speed_features = ['answering_speed']
-quality_features = ['ans_score', 'que_score']
-consistency_features = ['ans_stddev', 'que_stddev']
-gratitude_features = ['ans_comments', 'que_comments']
-competitiveness_features = ['relative_rank_pos']
-content_features = ['ans_length', 'que_length']
-knowledge_features = ['accepted_answerer_rep', 'max_rep_answerer',
-                      'num_que_answered', 'time_for_first_ans',
-                      'rep_questioner', 'rep_answerers',
-                      'rep_co_answerers', 'num_answers_recvd']
-
-analysis_feature_names = {
-    'temporal': temporal_features,
-    'frequency': frequency_features,
-    'speed': speed_features,
-    'quality': quality_features,
-    'consistency': consistency_features,
-    'gratitude': gratitude_features,
-    'competitiveness': competitiveness_features,
-    'content': content_features,
-    'knowledge': knowledge_features,
-}
-
 
 def init():
-    seed = 1234
-    np.random.seed(seed)
-
-
-def LogisticRegression_(*arg, **kwarg):
-    kwarg['max_iter'] = 1e3
-    kwarg['solver'] = 'saga'
-    kwarg['n_jobs'] = 8
-    return LogisticRegression(*arg, **kwarg)
+    np.random.seed(train_seed)
 
 
 def do_under_sampling(y_train):
@@ -73,7 +30,6 @@ def do_under_sampling(y_train):
 def learn_model(data, train_features, target='is_churn', model=DecisionTreeClassifier, seed=1234):
     X = data[train_features]
     y = data[target]
-    print(model.__name__)
 
     # 10-fold cross validation
     acc_list = []
@@ -99,16 +55,17 @@ def performance_on_task1(list_of_K, features_of_task1):
     for model_name in training_models:
         model = training_models[model_name]
         acc_models[model_name] = {}
+        print('Training model name:', model_name)
 
         for K in list_of_K:
-            print('Task 1, K={}'.format(K))
             train_features = [col for col in features_of_task1[K].columns
                               if col not in drop_user_columns + ['is_churn']]
 
+            print('Task 1, K={}'.format(K))
             acc_list = learn_model(features_of_task1[K], train_features, model=model)
             acc_mean = np.mean(acc_list)
             print('Accuracy: {}'.format(acc_mean))
-            print('    for each folds: {}'.format(acc_list))
+            # print('    for each folds: {}'.format(acc_list))
             acc_models[model_name][K] = acc_mean
 
     return acc_models
@@ -122,23 +79,24 @@ def performance_on_task2(list_of_T, features_of_task2):
     for model_name in training_models:
         model = training_models[model_name]
         acc_models[model_name] = {}
+        print('Training model name:', model_name)
 
         for T in list_of_T:
-            print('Task 2, T={}'.format(T))
             train_features = [col for col in features_of_task2[T].columns
                               if col not in drop_user_columns + ['is_churn']]
 
+            print('Task 2, T={}'.format(T))
             acc_list = learn_model(features_of_task2[T], train_features, model=model)
             acc_mean = np.mean(acc_list)
             print('Accuracy: {}'.format(acc_mean))
-            print('    for each folds: {}'.format(acc_list))
+            # print('    for each folds: {}'.format(acc_list))
             acc_models[model_name][T] = acc_mean
 
     return acc_models
 
 
-# Figure 5: Churn prediction accuracy when features from each category are used in isolation
 def measure_task1_accuracy_of_category(list_of_K, features_of_task1):
+    # Figure 5: Churn prediction accuracy when features from each category are used in isolation
     task1_accuracy_of_category = {}
     for name, feature_list in analysis_feature_names.items():
         accuracy_of_category = []
@@ -151,13 +109,13 @@ def measure_task1_accuracy_of_category(list_of_K, features_of_task1):
             if len(train_features) == 0:
                 continue
             print('\n{}, Task 1, K={}'.format(name, K))
-            print('    columns: {}'.format(train_features))
+            # print('    columns: {}'.format(train_features))
 
             acc_list = learn_model(features_of_task1[K], train_features)
             mean_acc = np.mean(acc_list)
             accuracy_of_category.append(mean_acc)
             print('Accuracy: {}'.format(mean_acc))
-            print('    for each folds: {}'.format(acc_list))
+            # print('    for each folds: {}'.format(acc_list))
 
         task1_accuracy_of_category[name] = accuracy_of_category
 
@@ -173,15 +131,17 @@ def measure_task2_accuracy_of_category(list_of_T, features_of_task2):
             if len(train_features) == 0:
                 continue
             print('\n{}, Task 2, T={}'.format(name, T))
-            print('    columns: {}'.format(train_features))
+            # print('    columns: {}'.format(train_features))
 
             acc_list = learn_model(features_of_task2[T], train_features)
             mean_acc = np.mean(acc_list)
             accuracy_of_category.append(mean_acc)
             print('Accuracy: {}'.format(mean_acc))
-            print('    for each folds: {}'.format(acc_list))
+            # print('    for each folds: {}'.format(acc_list))
 
         task2_accuracy_of_category[name] = accuracy_of_category
+
+    return task2_accuracy_of_category
 
 
 def performance_on_temporal(list_of_K, features_of_task1):
@@ -199,13 +159,13 @@ def performance_on_temporal(list_of_K, features_of_task1):
             if len(train_features) == 0:
                 continue
             print('\n{}, Task 1, K={}'.format(name, K))
-            print('    columns: {}'.format(train_features))
+            # print('    columns: {}'.format(train_features))
 
             acc_list = learn_model(features_of_task1[K], train_features)
             mean_acc = np.mean(acc_list)
             accuracy_with_time_gap.append(mean_acc)
             print('Accuracy: {}'.format(mean_acc))
-            print('    for each folds: {}'.format(acc_list))
+            # print('    for each folds: {}'.format(acc_list))
 
         task1_accuracy_with_time_gap[K] = accuracy_with_time_gap
 

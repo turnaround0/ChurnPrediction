@@ -319,16 +319,17 @@ def _fill_nan(features):
         features.time_for_first_ans = 1 / features.time_for_first_ans
         features.time_for_first_ans = features.time_for_first_ans.replace([np.nan], 0)
 
-    fill_constants = {
-        'accepted_answerer_rep': 0,
-        'max_rep_answerer': 0,
-        'num_que_answered': 0,
-        'rep_questioner': 0,
-        'rep_answerers': 0,
-        'rep_co_answerers': 0,
-        'num_answers_recvd': 0
-    }
-    return features.fillna(fill_constants)
+    # fill_constants = {
+    #     'accepted_answerer_rep': 0,
+    #     'max_rep_answerer': 0,
+    #     'num_que_answered': 0,
+    #     'rep_questioner': 0,
+    #     'rep_answerers': 0,
+    #     'rep_co_answerers': 0,
+    #     'num_answers_recvd': 0
+    # }
+    # return features.fillna(fill_constants)
+    return features.fillna(0)
 
 
 def fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2):
