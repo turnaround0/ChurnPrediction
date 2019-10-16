@@ -1,69 +1,79 @@
+import time
 import numpy as np
 from features import temporal, tasks, freq, know
 
 
-def getFeatures(features, users, posts, task, K=None, T=None):
-    assert (task in [1, 2])
-
-    if -1 in features.index:
-        features = features.drop([-1])
-
-    return features
-
-
-def apply_task1(users, posts):
-    list_of_K = range(1, 21)
+def get_users_posts_of_task1(list_of_K, users, posts):
+    print('*** Get users and posts of task1 ***')
+    start_time = time.time()
     users_of_task1, posts_of_task1 = {}, {}
 
     for K in list_of_K:
         posts_of_task1[K] = tasks.getTask1Posts(posts, K)
         users_of_task1[K] = tasks.getTask1Users(users, posts, K)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
     return users_of_task1, posts_of_task1
 
 
-def apply_pre_features_of_task1(users_of_task1, posts):
-    list_of_K = range(1, 21)
+def prepare_features_of_task1(list_of_K, users_of_task1, posts):
+    print('*** Prepare features of task1 ***')
+    start_time = time.time()
     features_of_task1 = {}
 
     for K in list_of_K:
         features_of_task1[K] = tasks.getTask1Labels(users_of_task1[K], posts, K)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
     return features_of_task1
 
 
-def apply_task2(users, posts):
-    list_of_T = [7, 15, 30]
-    users_of_task2 = {}
-    posts_of_task2 = {}
+def get_users_posts_of_task2(list_of_T, users, posts):
+    print('*** Get users and posts of task2 ***')
+    start_time = time.time()
+    users_of_task2, posts_of_task2 = {}, {}
 
     for T in list_of_T:
         posts_of_task2[T] = tasks.getTask2Posts(users, posts, T)
         users_of_task2[T] = tasks.getTask2Users(users, posts)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
     return users_of_task2, posts_of_task2
 
 
-def apply_pre_features_of_task2(users_of_task2, posts):
-    list_of_T = [7, 15, 30]
+def prepare_features_of_task2(list_of_T, users_of_task2, posts):
+    print('*** Prepare features of task2 ***')
+    start_time = time.time()
     features_of_task2 = {}
 
     for T in list_of_T:
         features_of_task2[T] = tasks.getTask2Labels(users_of_task2[T], posts, T)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
     return features_of_task2
 
 
-def apply_temporal_features_for_task1(features_of_task1, users_of_task1, posts_of_task1):
-    list_of_K = range(1, 21)
+def temporal_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Temporal features of task1 ***')
+    start_time = time.time()
+
     for K in list_of_K:
         features_of_task1[K]['gap1'] = temporal.getTimeGap1OfUser(users_of_task1[K], posts_of_task1[K])
         for k in range(2, K+1):
             features_of_task1[K]['gap{}'.format(k)] = temporal.getTimeGapkOfPosts(posts_of_task1[K], k)
 
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
 
-def apply_temporal_features_for_task2(features_of_task2, users_of_task2, posts_of_task2):
-    list_of_T = [7, 15, 30]
+
+def temporal_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Temporal features of task2 ***')
+    start_time = time.time()
+
     for T in list_of_T:
         users, posts = users_of_task2[T], posts_of_task2[T]
         features_of_task2[T]['gap1'] = temporal.getTimeGap1OfUser(users, posts)
@@ -71,6 +81,9 @@ def apply_temporal_features_for_task2(features_of_task2, users_of_task2, posts_o
         # features_of_task2[T]['last_gap'] = temporal.getTimeLastGapOfPosts(posts).fillna(0)
         features_of_task2[T]['time_since_last_post'] = temporal.getTimeSinceLastPost(users, posts, T)
         features_of_task2[T]['mean_gap'] = temporal.getTimeMeanGap(posts)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
 
 
 def apply_frequency_features_of_task1(features_of_task1, users_of_task1, posts_of_task1):
