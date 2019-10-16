@@ -104,37 +104,38 @@ def load_dataset(dataset_type):
 
     for dataset_name in dataset_names:
         pkl_file_path = data_path + dataset_name + '.pkl'
+        pkl_file_reduce_path = data_path + dataset_name + '_reduce.pkl'
 
         if os.path.exists(pkl_file_path):
-            df_list.append(load_from_pkl(pkl_file_path))
-        else:
-            if dataset_type == 'full':
-                # In case of full dataset, reduced pickle files were given.
-                # Link: https://drive.google.com/drive/folders/1Fp_7GDH_t7xfnU8aXeKrcBC54_nECOcu
-                pkl_file_reduce_path = data_path + dataset_name + '_reduce.pkl'
-                df = load_from_pkl(pkl_file_reduce_path)
-                df = cut_posts_by_period(dataset_name, df)
+            df = load_from_pkl(pkl_file_path)
+        elif dataset_type == 'full' and os.path.exists(pkl_file_reduce_path):
+            # In case of full dataset, reduced pickle files were given.
+            # Link: https://drive.google.com/drive/folders/1Fp_7GDH_t7xfnU8aXeKrcBC54_nECOcu
+            df = load_from_pkl(pkl_file_reduce_path)
+            df = cut_posts_by_period(dataset_name, df)
 
-                if dataset_name == 'Posts':
-                    df = full_posts_preprocess(df)
-                    df = set_posts_ith(df)
-                else:
-                    df = df.drop([-1])
-            else:   # if small or tiny dataset
-                xml_file_path = data_path + dataset_name + '.xml'
-                df = xml2df(xml_file_path)
-                df.CreationDate = pd.to_datetime(df.CreationDate)
-                df = cut_posts_by_period(dataset_name, df)
-
-                if dataset_name == 'Posts':
-                    df = posts_preprocess(df, df_list[0])
-                    df = set_posts_ith(df)
-                else:
-                    df = users_preprocess(df)
+            if dataset_name == 'Posts':
+                df = full_posts_preprocess(df)
+                df = set_posts_ith(df)
+            else:
+                df = df.drop([-1])
 
             save_to_pkl(df, pkl_file_path)
-            df_list.append(df)
+        else:
+            xml_file_path = data_path + dataset_name + '.xml'
+            df = xml2df(xml_file_path)
+            df.CreationDate = pd.to_datetime(df.CreationDate)
+            df = cut_posts_by_period(dataset_name, df)
 
+            if dataset_name == 'Posts':
+                df = posts_preprocess(df, df_list[0])
+                df = set_posts_ith(df)
+            else:
+                df = users_preprocess(df)
+
+            save_to_pkl(df, pkl_file_path)
+
+        df_list.append(df)
         print(dataset_name, 'shape:', df_list[-1].shape)
 
     end_time = time.time()
@@ -162,6 +163,30 @@ def store_features(list_of_K, list_of_T, features_of_task1, features_of_task2, f
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def restore_features(list_of_K, list_of_T, file_type='csv'):
+    print('*** Restore features ***')
+    print('File type:', file_type)
+    start_time = time.time()
+
+    features_of_task1, features_of_task2 = {}, {}
+
+    for K in list_of_K:
+        if file_type == 'csv':
+            features_of_task1[K] = pd.read_csv('output/task1_{}posts_features.csv'.format(K))
+        else:
+            features_of_task1[K] = pd.read_pickle('output/task1_{}posts_features.pkl'.format(K))
+
+    for T in list_of_T:
+        if file_type == 'csv':
+            features_of_task2[T] = pd.read_csv('output/task2_{}days_features.csv'.format(T))
+        else:
+            features_of_task2[T] = pd.read_pickle('output/task2_{}days_features.pkl'.format(T))
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+    return features_of_task1, features_of_task2
 
 
 def preprocess(users, posts):
