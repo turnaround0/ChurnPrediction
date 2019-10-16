@@ -1,66 +1,82 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from features import tasks, temporal
 
 
-def plot_figure2(features_of_task1):
+def plot_single_figure2(list_of_K, features_of_task1, is_display):
+    churn_list, stay_list = [], []
+
+    for K in list_of_K:
+        subgroup = features_of_task1[K]
+        churners_gap, stayers_gap = [], []
+
+        for i in range(2, K + 1):
+            gapK = 'gap{}'.format(i)
+            mean_gapK = list(subgroup.groupby('is_churn')[gapK].mean())
+            if len(mean_gapK) < 2:
+                break
+            churners_gap.append(mean_gapK[1])
+            stayers_gap.append(mean_gapK[0])
+
+        churn_list.append(churners_gap)
+        stay_list.append(stayers_gap)
+
+        fig, ax = plt.subplots(figsize=(6.8, 4.8))
+        x_axis = range(2, K + 1)
+        ax.set_title('Gap between posts (K = ' + str(K) + ')')
+        ax.set_xlabel('P where y(P) indicates gap between post P-1 and P')
+        ax.set_ylabel('Mean time gap between posts (minutes)')
+        ax.plot(x_axis, churners_gap, '-o', label='churner')
+        ax.plot(x_axis, stayers_gap, '-o', label='stayer')
+        ax.xaxis.set_ticks(range(0, 21, 5))
+        ax.grid(linestyle=':')
+        ax.legend()
+        ax.axis((0, 21, 0, 15e4))
+        fig.savefig('output/figure2_gap{}.png'.format(K))
+        if is_display:
+            plt.show()
+        plt.close(fig)
+
+    return churn_list, stay_list
+
+
+def plot_multi_figure2(plot_type, churn_list, stay_list, is_display):
+    fig, axs = plt.subplots(2, 2, figsize=(6.4 * 2, 4.8 * 2))
+    ax_list = [ax for sub_axs in axs for ax in sub_axs]
+
+    if plot_type == 'first':
+        plot_zip = zip(churn_list[1:], stay_list[1:], ax_list)
+    else:   # If plot_type is 'last'
+        plot_zip = zip(churn_list[-4:], stay_list[-4:], ax_list)
+
+    for churners, stayers, ax in plot_zip:
+        x_axis = range(2, len(churners) + 2)
+        ax.plot(x_axis, churners, '-o', label='churner')
+        ax.plot(x_axis, stayers, '-o', label='stayer')
+        ax.xaxis.set_ticks(range(0, 21, 5))
+        ax.grid(linestyle=':')
+        ax.legend()
+        ax.axis((0, 21, 0, 15e4))
+
+    fig.suptitle('Gap between posts')
+    fig.text(0.5, 0.04, 'P where y(P) indicates gap between post P-1 and P', ha='center')
+    fig.text(0.04, 0.5, 'Mean time gap between posts (minutes)', va='center', rotation='vertical')
+    fig.savefig('output/figure2_gap_{}.png'.format(plot_type))
+    if is_display:
+        plt.show()
+    plt.close(fig)
+
+
+def plot_figure2(list_of_K, features_of_task1, is_display=False):
     # Figure 2: Gap between posts
     #    For a user who churns, gap between consecutive posts keeps increasing.
     #    Gaps for those who stay are much lower, and stabilize around 20,000 minutes,
     #    indicating routine posting activity in every ≈2 weeks.
-    list_of_K = range(1, 21)
-    clist = []
-    slist = []
-    for K in list_of_K:
-        subgroup = features_of_task1[K]
-        churners_gap = []
-        stayers_gap = []
-        for i in range(2, K + 1):
-            gapK = 'gap{}'.format(i)
-            sum_gapK = list(subgroup.groupby('is_churn')[gapK].sum())
-            count_gapK = list(subgroup.groupby('is_churn')[gapK].count())
-            if len(sum_gapK) < 2:
-                break
-            churners_gap.append(sum_gapK[1] / count_gapK[1])
-            stayers_gap.append(sum_gapK[0] / count_gapK[0])
+    churn_list, stay_list = plot_single_figure2(list_of_K, features_of_task1, is_display)
 
-        clist.append(churners_gap)
-        slist.append(stayers_gap)
-
-        # print("K={}".format(K))
-        plt.plot(churners_gap, '-o', label='churner')
-        plt.plot(stayers_gap, '-o', label='stayer')
-        plt.legend()
-        plt.axis((0, 20, 0, 15e4))
-        plt.show()
-
-    fig = plt.figure()
-    ax1 = fig.add_subplot(2, 2, 1)
-    ax2 = fig.add_subplot(2, 2, 2)
-    ax3 = fig.add_subplot(2, 2, 3)
-    ax4 = fig.add_subplot(2, 2, 4)
-    axlist = [ax1, ax2, ax3, ax4]
-    for c, s, ax in zip(clist[1:], slist[1:], axlist):
-        ax.plot(c, '-o', label='churner')
-        ax.plot(s, '-o', label='stayer')
-        ax.legend()
-        ax.axis((0, 20, 0, 15e4))
-    plt.show()
-
-    fig = plt.figure()
-    ax1 = fig.add_subplot(2, 2, 1)
-    ax2 = fig.add_subplot(2, 2, 2)
-    ax3 = fig.add_subplot(2, 2, 3)
-    ax4 = fig.add_subplot(2, 2, 4)
-    axlist = [ax1, ax2, ax3, ax4]
-    for c, s, ax in zip(clist[-4:], slist[-4:], axlist):
-        ax.plot(c, '-o', label='churner')
-        ax.plot(s, '-o', label='stayer')
-        ax.legend()
-        ax.axis((0, 20, 0, 15e4))
-    plt.show()
+    plot_multi_figure2('first', churn_list, stay_list, is_display)
+    plot_multi_figure2('last', churn_list, stay_list, is_display)
 
 
 def plot_figure2_backup(users, posts, posts_group):
