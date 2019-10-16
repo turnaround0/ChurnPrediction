@@ -132,3 +132,4 @@ dataset/full/
 
 # Output files
 output/*.csv
+output/*.png
