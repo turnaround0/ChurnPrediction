@@ -16,13 +16,12 @@ def main():
     parser = argparse.ArgumentParser(description='***** Churn prediction *****')
     parser.add_argument('-d', action='store_true', help='show plots')
     parser.add_argument('-r', action='store_true', help='restore features instead of making them')
-    parser.add_argument('-s', action='store', help='Set: Config set name (ex: -s test')
     args = parser.parse_args()
 
     list_of_K = range(1, 21)
     list_of_T = [7, 15, 30]
 
-    users_df, posts_df = load_dataset('full')
+    users_df, posts_df = load_dataset('small')
     preprocess(users_df, posts_df)
 
     if args.r:
@@ -50,13 +49,13 @@ def main():
         analysis.plot_figure4(list_of_K, features_of_task1, args.d)
 
         apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
-        # store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
+        store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
     train.init()
-    train.table2(features_of_task1)
-    train.table3(features_of_task2)
-    train.figure5(features_of_task1)
-    train.temporal_feature_analysis(features_of_task1)
+    train.performance_on_task1(list_of_K, features_of_task1)
+    train.table3(list_of_T, features_of_task2)
+    train.figure5(list_of_K, features_of_task1)
+    train.temporal_feature_analysis(list_of_K, features_of_task1)
 
 
 if __name__ == '__main__':
