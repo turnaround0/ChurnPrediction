@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.tree import DecisionTreeClassifier
@@ -9,6 +10,13 @@ from sklearn.model_selection import KFold
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+training_models = {
+    'Decision Tree': DecisionTreeClassifier,
+    # 'SVM (Linear)': LinearSVC,
+    # 'SVM (RBF)': SVC,
+    'Logistic Regression': LogisticRegression,
+}
 
 
 def init():
@@ -41,7 +49,10 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
     y = data[target]
     print(model.__name__)
 
-    ### 10-fold cross validation ###
+    X_na = X[X.isna().any(axis=1)]
+    print(X_na)
+
+    # 10-fold cross validation
     acc_list = []
     kf = KFold(n_splits=10, shuffle=True, random_state=seed)
     for train_index, test_index in kf.split(X):
@@ -49,7 +60,7 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
         train_index = do_under_sampling(y.iloc[train_index])
         X_train, y_train = X.reindex(train_index), y.reindex(train_index)
 
-        ### Learn Model ###
+        # Learn Model
         mdl = model().fit(X_train, y_train)
         pred = mdl.predict(X_test)
         acc = (pred == y_test)
@@ -57,14 +68,46 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
     return acc_list
 
 
-def table2(features_of_task1):
+def performance_on_task1(list_of_K, features_of_task1):
+    # Table 2: Performance on Task 1
+    drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
+    acc_models = {}
+
+    for model_name in training_models:
+        model = training_models[model_name]
+        acc_models[model_name] = {}
+
+        for K in list_of_K:
+            print('Task 1, K={}'.format(K))
+            train_features = [col for col in features_of_task1[K].columns
+                              if col not in drop_user_columns + ['is_churn']]
+
+            acc_list = learn_model(features_of_task1[K], train_features, model=model)
+            acc_mean = np.mean(acc_list)
+            print('Accuracy: {}'.format(acc_mean))
+            print('    for each folds: {}'.format(acc_list))
+            acc_models[model_name][K] = acc_mean
+
+    plot_table2(list_of_K, acc_models)
+
+
+def plot_table2(list_of_K, acc_models):
+    columns = ['k(posts)'] + list(acc_models.keys())
+    lines = []
+    for K in list_of_K:
+        lines.append([K] + [acc_models[model_name][K] for model_name in acc_models.keys()])
+    df = pd.DataFrame(lines, columns=columns).set_index('k(posts)')
+    print(df)
+    df.to_csv('output/table2.csv')
+
+
+def table2(list_of_K, features_of_task1):
     # Table 2: Performance on Task 1
     drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
 
     # model = LogisticRegression_
     model = DecisionTreeClassifier
 
-    list_of_K = range(1, 21)
     for K in list_of_K:
         print('Task 1, K={}'.format(K))
         train_features = [col for col in features_of_task1[K].columns
@@ -75,14 +118,13 @@ def table2(features_of_task1):
         print('    for each folds: {}'.format(acc_list))
 
 
-def table3(features_of_task2):
+def table3(list_of_T, features_of_task2):
     # Table 3: Performance on Task 2
     drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate']
 
     # model = LogisticRegression_
     model = DecisionTreeClassifier
 
-    list_of_T = [7, 15, 30]
     for T in list_of_T:
         print('Task 2, T={}'.format(T))
         train_features = [col for col in features_of_task2[T].columns
@@ -93,7 +135,7 @@ def table3(features_of_task2):
         print('    for each folds: {}'.format(acc_list))
 
 
-def figure5(features_of_task1):
+def figure5(list_of_K, features_of_task1):
     # Figure 5: Churn prediction accuracy when features from each category are used in isolation
     temporal_features = ['gap1', 'last_gap', 'time_since_last_post', 'mean_gap']
     frequency_features = ['num_answers', 'num_questions',
@@ -124,7 +166,6 @@ def figure5(features_of_task1):
     task1_accuracy_of_category = {}
     for name, feature_list in analysis_feature_names.items():
         accuracy_of_category = []
-        list_of_K = range(1, 21)
         for K in list_of_K:
             if name == 'temporal':
                 feature_list = ['gap{}'.format(j) for j in range(1, K + 1)]
@@ -159,7 +200,7 @@ def figure5(features_of_task1):
         plt.show()
 
 
-def temporal_feature_analysis(features_of_task1):
+def temporal_feature_analysis(list_of_K, features_of_task1):
     ### Temporal Feature Analysis - Task 1 ###
     temporal_analysis_feature_func = {
         'gapK': lambda K: ['gap{}'.format(j) for j in range(1, K + 1)],
@@ -167,7 +208,6 @@ def temporal_feature_analysis(features_of_task1):
     }
 
     task1_accuracy_with_time_gap = {}
-    list_of_K = range(1, 21)
     for K in list_of_K:
         accuracy_with_time_gap = []
         for name, feature_func in temporal_analysis_feature_func.items():
