@@ -23,6 +23,19 @@ def LogisticRegression_(*arg, **kwarg):
     return LogisticRegression(*arg, **kwarg)
 
 
+def do_under_sampling(y_train):
+    churners = y_train[y_train == 1].index
+    stayers = y_train[y_train == 0].index
+    n_churn, n_stay = len(churners), len(stayers)
+
+    if n_churn > n_stay:
+        churners = np.random.choice(churners, n_stay, replace=False)
+    else:
+        stayers = np.random.choice(stayers, n_churn, replace=False)
+
+    return np.array(list(churners) + list(stayers))
+
+
 def learn_model(data, train_features, target='is_churn', model=DecisionTreeClassifier, seed=1234):
     X = data[train_features]
     y = data[target]
@@ -32,19 +45,8 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
     acc_list = []
     kf = KFold(n_splits=10, shuffle=True, random_state=seed)
     for train_index, test_index in kf.split(X):
-        X_train, X_test = X.iloc[train_index], X.iloc[test_index]
-        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
-
-        ### Under-sampling ###
-        churners = y_train[y_train == 1].index
-        stayers = y_train[y_train == 0].index
-        n_churn = len(churners)
-        n_stay = len(stayers)
-        if n_churn > n_stay:
-            churners = np.random.choice(churners, n_stay, replace=False)
-        else:
-            stayers = np.random.choice(stayers, n_churn, replace=False)
-        train_index = np.array(list(churners) + list(stayers))
+        X_test, y_test = X.iloc[test_index], y.iloc[test_index]
+        train_index = do_under_sampling(y.iloc[train_index])
         X_train, y_train = X.reindex(train_index), y.reindex(train_index)
 
         ### Learn Model ###
