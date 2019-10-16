@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from features import tasks, temporal
-
 
 def plot_single_figure2(list_of_K, features_of_task1, is_display):
     churn_list, stay_list = [], []
@@ -62,7 +60,7 @@ def plot_multi_figure2(plot_type, churn_list, stay_list, is_display):
     fig.suptitle('Gap between posts')
     fig.text(0.5, 0.04, 'P where y(P) indicates gap between post P-1 and P', ha='center')
     fig.text(0.04, 0.5, 'Mean time gap between posts (minutes)', va='center', rotation='vertical')
-    fig.savefig('output/figure2_gap_{}.png'.format(plot_type))
+    fig.savefig('output/figure2_gap_{}_four.png'.format(plot_type))
     if is_display:
         plt.show()
     plt.close(fig)
@@ -72,63 +70,28 @@ def plot_figure2(list_of_K, features_of_task1, is_display=False):
     # Figure 2: Gap between posts
     #    For a user who churns, gap between consecutive posts keeps increasing.
     #    Gaps for those who stay are much lower, and stabilize around 20,000 minutes,
-    #    indicating routine posting activity in every ≈2 weeks.
+    #    indicating routine posting activity in every 2 weeks.
     churn_list, stay_list = plot_single_figure2(list_of_K, features_of_task1, is_display)
 
     plot_multi_figure2('first', churn_list, stay_list, is_display)
     plot_multi_figure2('last', churn_list, stay_list, is_display)
 
 
-def plot_figure2_backup(users, posts, posts_group):
-    # Figure 2: Gap between posts
-    #    For a user who churns, gap between consecutive posts keeps increasing.
-    #    Gaps for those who stay are much lower, and stabilize around 20,000 minutes,
-    #      indicating routine posting activity in every 2 weeks.
-    # Draw plot for each fold about best and worst models
-    # fig, axs = plt.subplots(2, 2, figsize=(6.4 * 2, 4.8 * 2))
-
-    churn_gaps = []
-    stay_gaps = []
-    for K in range(2, 21):
-        # ax = axs[idx]
-        churn_df = tasks.getTask1Labels(users, posts_group, K)
-        mean_gap_df = temporal.getTimeMeanGap(posts)
-        df = churn_df.merge(mean_gap_df, how='left', left_index=True, right_index=True)
-
-        churn_gap = df[df.is_churn == 1].gap.mean()
-        stay_gap = df[df.is_churn == 0].gap.mean()
-
-        print('GAP (churn, stay) =', churn_gap, stay_gap)
-
-        churn_gaps.append(churn_gap)
-        stay_gaps.append(stay_gap)
-
-        fig, ax = plt.subplots()
-        ax.set_title('Gap between posts ' + str(K))
-        ax.set_xlabel('P where y(P) indicates gap between post P-1 and P')
-        ax.set_ylabel('Mean timegap between posts (minutes)')
-
-        x_axis = range(2, K + 1)
-        ax.set_xlim(0, 21)
-        ax.plot(x_axis, churn_gaps, label='Churn', marker='o')
-        ax.plot(x_axis, stay_gaps, label='Stay', marker='o')
-        ax.legend()
-        plt.show()
-
-    # plt.show()
-
-
-def plot_figure3(features_of_task2):
-    # Figure 3: # Answers vs Churn probability
+def plot_figure3(list_of_T, features_of_task2, is_display=False):
+    # Figure 3: Answers vs Churn probability
     #    The probability of churning for a user decreases the more answers s/he provides.
     #    It is even lower if s/he asks more questions alongside.
     min_num_users = 50
-    list_of_T = [7, 15, 30]
-
     for T in list_of_T:
         task2 = features_of_task2[T]
+
+        fig, ax = plt.subplots()
+        ax.set_title('# Answers vs Churn probability')
+        ax.set_xlabel('Number of answers given by the user')
+        ax.set_ylabel('Probability of churning')
+
         for num_que_ask in range(5):
-            subgroup = task2[task2['num_questions'] == num_que_ask]
+            subgroup = task2[task2.num_questions == num_que_ask]
             churn_probs = []
             num_answers = list(set(subgroup['num_answers']))
             num_answers.sort()
@@ -138,51 +101,62 @@ def plot_figure3(features_of_task2):
                 if sub_subgroup.shape[0] >= min_num_users:
                     churn_probs.append((num_ans, prob))
 
-            plt.plot([np.log10(x[0] + 1) for x in churn_probs],
-                     [np.log10(x[1] + 0.01) for x in churn_probs],
-                     '-o',
-                     label='{} ques asked'.format(num_que_ask))
-        print("# Answers vs Churn probability")
-        plt.legend()
-        plt.axis((0, 2, -2, 0))
-        plt.show()
+            ax.plot([np.log10(x[0] + 1) for x in churn_probs],
+                    [np.log10(x[1] + 0.01) for x in churn_probs],
+                    '-o', label='{} ques asked'.format(num_que_ask))
+
+        ax.legend()
+        ax.axis((0, 2, -2, 0))
+        fig.savefig('output/figure3_{}days.png'.format(T))
+        if is_display:
+            plt.show()
+        plt.close(fig)
 
 
-def plot_figure4(features_of_task1):
+def plot_figure4(list_of_K, features_of_task1, is_display=False):
     # Figure 4: K vs Time taken for the first answer to arrive
     #  The more the time taken for a user to receive an answer,
     #  the lesser the satisfaction level and the more the chances of churning.
-    list_of_K = range(1, 21)
-    churners_time = []
-    stayers_time = []
+    churners_time, stayers_time = [], []
     for K in list_of_K:
         subgroup = features_of_task1[K]
-        churners = subgroup[subgroup['is_churn'] == 1][subgroup['time_for_first_ans'] > 0]
-        stayers = subgroup[subgroup['is_churn'] == 0][subgroup['time_for_first_ans'] > 0]
-        churners_time.append(churners['time_for_first_ans'].mean())
-        stayers_time.append(stayers['time_for_first_ans'].mean())
+        churners = subgroup[subgroup.is_churn == 1][subgroup.time_for_first_ans > 0]
+        stayers = subgroup[subgroup.is_churn == 0][subgroup.time_for_first_ans > 0]
+        churners_time.append(churners.time_for_first_ans.mean())
+        stayers_time.append(stayers.time_for_first_ans.mean())
 
-    plt.plot(churners_time, '-o', label='churner')
-    plt.plot(stayers_time, '-o', label='stayer')
-    plt.legend()
-    # plt.axis((0,20,8e3,22e3))
-    plt.show()
+        print('K:', K)
+        print(subgroup.time_for_first_ans)
+
+    fig, ax = plt.subplots()
+    ax.set_title('K vs Time taken for the first answer to arrive')
+    ax.set_xlabel('Number of observation posts(K)')
+    ax.set_ylabel('Time taken for the first answer to arrive')
+    x_axis = range(1, list_of_K[-1] + 1)
+    ax.plot(x_axis, churners_time, '-o', label='churner')
+    ax.plot(x_axis, stayers_time, '-o', label='stayer')
+    ax.legend()
+    fig.savefig('output/figure4.png')
+    if is_display:
+        plt.show()
+    plt.close(fig)
 
 
-def plot_table2():
+def plot_table2(task1_features):
     # Table 2: Performance on Task 1
     seed = 1234
 
     for i, features in enumerate(task1_features):
         pass
 
-def plot_table3():
+
+def plot_table3(task2_features):
     # Table 3: Performance on Task 2
     for i, features in enumerate(task2_features):
         pass
 
 
-def plot_table4():
+def plot_table4(task1_features):
     # Table 4: Temporal Features Analysis
     for i, features in enumerate(task1_features):
         pass
