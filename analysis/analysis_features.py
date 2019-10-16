@@ -140,28 +140,3 @@ def plot_figure4(list_of_K, features_of_task1, is_display=False):
     if is_display:
         plt.show()
     plt.close(fig)
-
-
-def plot_table2(task1_features):
-    # Table 2: Performance on Task 1
-    seed = 1234
-
-    for i, features in enumerate(task1_features):
-        pass
-
-
-def plot_table3(task2_features):
-    # Table 3: Performance on Task 2
-    for i, features in enumerate(task2_features):
-        pass
-
-
-def plot_table4(task1_features):
-    # Table 4: Temporal Features Analysis
-    for i, features in enumerate(task1_features):
-        pass
-
-
-def plot_table5():
-    # Figure 5: Churn prediction accuracy when features from each category are used in isolation
-    pass

@@ -5,7 +5,7 @@ from pandas.core.common import SettingWithCopyWarning
 
 from dataset.dataset import load_dataset, preprocess, store_features, restore_features
 from features import apply
-from analysis import analysis
+from analysis import analysis_features, analysis_train
 from train import train
 
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
@@ -24,6 +24,7 @@ def main():
     users_df, posts_df = load_dataset('small')
     preprocess(users_df, posts_df)
 
+    # Featuring from dataset
     if args.r:
         features_of_task1, features_of_task2 = restore_features(list_of_K, list_of_T)
     else:
@@ -36,26 +37,39 @@ def main():
         apply.temporal_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
         apply.temporal_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
 
-        analysis.plot_figure2(list_of_K, features_of_task1, args.d)
+        analysis_features.plot_figure2(list_of_K, features_of_task1, args.d)
 
         apply.frequency_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
         apply.frequency_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
 
-        analysis.plot_figure3(list_of_T, features_of_task2, args.d)
+        analysis_features.plot_figure3(list_of_T, features_of_task2, args.d)
 
         apply.knowledge_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1, posts_df)
         apply.knowledge_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
 
-        analysis.plot_figure4(list_of_K, features_of_task1, args.d)
+        analysis_features.plot_figure4(list_of_K, features_of_task1, args.d)
 
         apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
         store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
+    # Training and measure performance on each task
     train.init()
-    train.performance_on_task1(list_of_K, features_of_task1)
-    train.table3(list_of_T, features_of_task2)
-    train.figure5(list_of_K, features_of_task1)
-    train.temporal_feature_analysis(list_of_K, features_of_task1)
+
+    acc_models = train.performance_on_task1(list_of_K, features_of_task1)
+    analysis_train.plot_table2(list_of_K, acc_models)
+
+    acc_models = train.performance_on_task2(list_of_T, features_of_task2)
+    analysis_train.plot_table3(list_of_T, acc_models)
+
+    task1_accuracy_of_category = train.measure_task1_accuracy_of_category(list_of_K, features_of_task1)
+    analysis_train.figure5_of_task1(list_of_K, task1_accuracy_of_category, True)
+
+    task2_accuracy_of_category = train.measure_task2_accuracy_of_category(list_of_T, features_of_task1)
+    analysis_train.figure5_of_task2(list_of_T, task2_accuracy_of_category, True)
+
+    # Training and measure performance on each feature
+    task1_accuracy_with_time_gap = train.performance_on_temporal(list_of_K, features_of_task1)
+    analysis_train.plot_table4(task1_accuracy_with_time_gap)
 
 
 if __name__ == '__main__':

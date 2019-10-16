@@ -1,14 +1,14 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.svm import SVC
-from sklearn.svm import LinearSVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import KFold
 
 import warnings
+
+from analysis.analysis_train import plot_table2
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 training_models = {
@@ -16,6 +16,32 @@ training_models = {
     # 'SVM (Linear)': LinearSVC,
     # 'SVM (RBF)': SVC,
     'Logistic Regression': LogisticRegression,
+}
+
+temporal_features = ['gap1', 'last_gap', 'time_since_last_post', 'mean_gap']
+frequency_features = ['num_answers', 'num_questions',
+                      'ans_que_ratio', 'num_posts']
+speed_features = ['answering_speed']
+quality_features = ['ans_score', 'que_score']
+consistency_features = ['ans_stddev', 'que_stddev']
+gratitude_features = ['ans_comments', 'que_comments']
+competitiveness_features = ['relative_rank_pos']
+content_features = ['ans_length', 'que_length']
+knowledge_features = ['accepted_answerer_rep', 'max_rep_answerer',
+                      'num_que_answered', 'time_for_first_ans',
+                      'rep_questioner', 'rep_answerers',
+                      'rep_co_answerers', 'num_answers_recvd']
+
+analysis_feature_names = {
+    'temporal': temporal_features,
+    'frequency': frequency_features,
+    'speed': speed_features,
+    'quality': quality_features,
+    'consistency': consistency_features,
+    'gratitude': gratitude_features,
+    'competitiveness': competitiveness_features,
+    'content': content_features,
+    'knowledge': knowledge_features,
 }
 
 
@@ -48,9 +74,6 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
     X = data[train_features]
     y = data[target]
     print(model.__name__)
-
-    X_na = X[X.isna().any(axis=1)]
-    print(X_na)
 
     # 10-fold cross validation
     acc_list = []
@@ -88,81 +111,34 @@ def performance_on_task1(list_of_K, features_of_task1):
             print('    for each folds: {}'.format(acc_list))
             acc_models[model_name][K] = acc_mean
 
-    plot_table2(list_of_K, acc_models)
+    return acc_models
 
 
-def plot_table2(list_of_K, acc_models):
-    columns = ['k(posts)'] + list(acc_models.keys())
-    lines = []
-    for K in list_of_K:
-        lines.append([K] + [acc_models[model_name][K] for model_name in acc_models.keys()])
-    df = pd.DataFrame(lines, columns=columns).set_index('k(posts)')
-    print(df)
-    df.to_csv('output/table2.csv')
-
-
-def table2(list_of_K, features_of_task1):
-    # Table 2: Performance on Task 1
-    drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
-
-    # model = LogisticRegression_
-    model = DecisionTreeClassifier
-
-    for K in list_of_K:
-        print('Task 1, K={}'.format(K))
-        train_features = [col for col in features_of_task1[K].columns
-                          if col not in drop_user_columns + ['is_churn']]
-
-        acc_list = learn_model(features_of_task1[K], train_features, model=model)
-        print('Accuracy: {}'.format(np.mean(acc_list)))
-        print('    for each folds: {}'.format(acc_list))
-
-
-def table3(list_of_T, features_of_task2):
+def performance_on_task2(list_of_T, features_of_task2):
     # Table 3: Performance on Task 2
     drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate']
+    acc_models = {}
 
-    # model = LogisticRegression_
-    model = DecisionTreeClassifier
+    for model_name in training_models:
+        model = training_models[model_name]
+        acc_models[model_name] = {}
 
-    for T in list_of_T:
-        print('Task 2, T={}'.format(T))
-        train_features = [col for col in features_of_task2[T].columns
-                          if col not in drop_user_columns + ['is_churn']]
+        for T in list_of_T:
+            print('Task 2, T={}'.format(T))
+            train_features = [col for col in features_of_task2[T].columns
+                              if col not in drop_user_columns + ['is_churn']]
 
-        acc_list = learn_model(features_of_task2[T], train_features, model=model)
-        print('Accuracy: {}'.format(np.mean(acc_list)))
-        print('    for each folds: {}'.format(acc_list))
+            acc_list = learn_model(features_of_task2[T], train_features, model=model)
+            acc_mean = np.mean(acc_list)
+            print('Accuracy: {}'.format(acc_mean))
+            print('    for each folds: {}'.format(acc_list))
+            acc_models[model_name][T] = acc_mean
+
+    return acc_models
 
 
-def figure5(list_of_K, features_of_task1):
-    # Figure 5: Churn prediction accuracy when features from each category are used in isolation
-    temporal_features = ['gap1', 'last_gap', 'time_since_last_post', 'mean_gap']
-    frequency_features = ['num_answers', 'num_questions',
-                          'ans_que_ratio', 'num_posts']
-    speed_features = ['answering_speed']
-    quality_features = ['ans_score', 'que_score']
-    consistency_features = ['ans_stddev', 'que_stddev']
-    gratitude_features = ['ans_comments', 'que_comments']
-    competitiveness_features = ['relative_rank_pos']
-    content_features = ['ans_length', 'que_length']
-    knowledge_features = ['accepted_answerer_rep', 'max_rep_answerer',
-                          'num_que_answered', 'time_for_first_ans',
-                          'rep_questioner', 'rep_answerers',
-                          'rep_co_answerers', 'num_answers_recvd']
-
-    analysis_feature_names = {
-        'temporal': temporal_features,
-        'frequency': frequency_features,
-        'speed': speed_features,
-        'quality': quality_features,
-        'consistency': consistency_features,
-        'gratitude': gratitude_features,
-        'competitiveness': competitiveness_features,
-        'content': content_features,
-        'knowledge': knowledge_features,
-    }
-
+# Figure 5: Churn prediction accuracy when features from each category are used in isolation
+def measure_task1_accuracy_of_category(list_of_K, features_of_task1):
     task1_accuracy_of_category = {}
     for name, feature_list in analysis_feature_names.items():
         accuracy_of_category = []
@@ -170,7 +146,7 @@ def figure5(list_of_K, features_of_task1):
             if name == 'temporal':
                 feature_list = ['gap{}'.format(j) for j in range(1, K + 1)]
             elif name == 'frequency':
-                features_list = [feat for feat in feature_list if feat != 'num_posts']
+                feature_list = [feat for feat in feature_list if feat != 'num_posts']
             train_features = [feat for feat in feature_list if feat in features_of_task1[K].columns]
             if len(train_features) == 0:
                 continue
@@ -185,26 +161,33 @@ def figure5(list_of_K, features_of_task1):
 
         task1_accuracy_of_category[name] = accuracy_of_category
 
-    # Bar Chart
-    for title, predictions in task1_accuracy_of_category.items():
-        if len(predictions) == 0:
-            continue
-        n_groups = len(list_of_K)
-        index = np.arange(n_groups)
-
-        plt.bar(index, predictions, tick_label=list_of_K, align='center')
-
-        plt.title(title)
-        plt.xlim(-1, n_groups)
-        plt.ylim(40, 100)
-        plt.show()
+    return task1_accuracy_of_category
 
 
-def temporal_feature_analysis(list_of_K, features_of_task1):
-    ### Temporal Feature Analysis - Task 1 ###
+def measure_task2_accuracy_of_category(list_of_T, features_of_task2):
+    task2_accuracy_of_category = {}
+    for name, feature_list in analysis_feature_names.items():
+        accuracy_of_category = []
+        for T in list_of_T:
+            train_features = [feat for feat in feature_list if feat in features_of_task2[T].columns]
+            if len(train_features) == 0:
+                continue
+            print('\n{}, Task 2, T={}'.format(name, T))
+            print('    columns: {}'.format(train_features))
+
+            acc_list = learn_model(features_of_task2[T], train_features)
+            mean_acc = np.mean(acc_list)
+            accuracy_of_category.append(mean_acc)
+            print('Accuracy: {}'.format(mean_acc))
+            print('    for each folds: {}'.format(acc_list))
+
+        task2_accuracy_of_category[name] = accuracy_of_category
+
+
+def performance_on_temporal(list_of_K, features_of_task1):
     temporal_analysis_feature_func = {
-        'gapK': lambda K: ['gap{}'.format(j) for j in range(1, K + 1)],
-        'last_gap': lambda K: ['gap{}'.format(K)]
+        'gapK': lambda k: ['gap{}'.format(j) for j in range(1, k + 1)],
+        'last_gap': lambda k: ['gap{}'.format(k)]
     }
 
     task1_accuracy_with_time_gap = {}
@@ -226,6 +209,4 @@ def temporal_feature_analysis(list_of_K, features_of_task1):
 
         task1_accuracy_with_time_gap[K] = accuracy_with_time_gap
 
-    # Table 4: Temporal gap features analysis
-    for K, acc in task1_accuracy_with_time_gap.items():
-        print(K, acc)
+    return task1_accuracy_with_time_gap
