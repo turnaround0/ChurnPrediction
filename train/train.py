@@ -54,7 +54,7 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
 
 def performance_on_task1(list_of_K, features_of_task1):
     # Table 2: Performance on Task 1
-    drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
+    drop_user_columns = ['Id', 'Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
     acc_models = {}
 
     for model_name in training_models:
@@ -69,15 +69,15 @@ def performance_on_task1(list_of_K, features_of_task1):
             print('Task 1, K={}'.format(K))
             acc_list = learn_model(features_of_task1[K], train_features, model=model)
             acc_mean = np.mean(acc_list)
-            print('Accuracy: {}'.format(acc_mean))
             acc_models[model_name][K] = acc_mean
+            print('Accuracy: {}'.format(acc_mean))
 
     return acc_models
 
 
 def performance_on_task2(list_of_T, features_of_task2):
     # Table 3: Performance on Task 2
-    drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
+    drop_user_columns = ['Id', 'Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
     acc_models = {}
 
     for model_name in training_models:
@@ -92,8 +92,8 @@ def performance_on_task2(list_of_T, features_of_task2):
             print('Task 2, T={}'.format(T))
             acc_list = learn_model(features_of_task2[T], train_features, model=model)
             acc_mean = np.mean(acc_list)
-            print('Accuracy: {}'.format(acc_mean))
             acc_models[model_name][T] = acc_mean
+            print('Accuracy: {}'.format(acc_mean))
 
     return acc_models
 
@@ -104,16 +104,16 @@ def measure_task1_accuracy_of_category(list_of_K, features_of_task1):
     for name, feature_list in analysis_feature_names.items():
         accuracy_of_category = []
         for K in list_of_K:
-            if name == 'temporal':
+            if name == 'Temporal':
                 feature_list = ['gap{}'.format(j) for j in range(1, K + 1)]
-            elif name == 'frequency':
+            elif name == 'Frequency':
                 feature_list = [feat for feat in feature_list if feat != 'num_posts']
 
             train_features = [feat for feat in feature_list if feat in features_of_task1[K].columns]
             if len(train_features) == 0:
                 continue
-            print('\n{}, Task 1, K={}'.format(name, K))
 
+            print('\n{}, Task 1, K={}'.format(name, K))
             acc_list = learn_model(features_of_task1[K], train_features)
             mean_acc = np.mean(acc_list)
             accuracy_of_category.append(mean_acc)
@@ -132,8 +132,8 @@ def measure_task2_accuracy_of_category(list_of_T, features_of_task2):
             train_features = [feat for feat in feature_list if feat in features_of_task2[T].columns]
             if len(train_features) == 0:
                 continue
-            print('\n{}, Task 2, T={}'.format(name, T))
 
+            print('\n{}, Task 2, T={}'.format(name, T))
             acc_list = learn_model(features_of_task2[T], train_features)
             mean_acc = np.mean(acc_list)
             accuracy_of_category.append(mean_acc)
@@ -157,8 +157,8 @@ def performance_on_temporal(list_of_K, features_of_task1):
             train_features = [feat for feat in feature_func(K) if feat in features_of_task1[K].columns]
             if len(train_features) == 0:
                 continue
-            print('\n{}, Task 1, K={}'.format(name, K))
 
+            print('\n{}, Task 1, K={}'.format(name, K))
             acc_list = learn_model(features_of_task1[K], train_features)
             mean_acc = np.mean(acc_list)
             accuracy_with_time_gap.append(mean_acc)
