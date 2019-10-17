@@ -21,6 +21,8 @@ def logistic_regression_with_args(*arg, **kwargs):
 
 def svc_with_args(*args, **kwargs):
     kwargs['max_iter'] = 1e3
+    kwargs['gamma'] = 'auto'
+    kwargs['kernel'] = 'rbf'
     kwargs['random_state'] = 1234
     return SVC(*args, **kwargs)
 
