@@ -14,7 +14,7 @@ def decision_tree_classifier_with_args(*arg, **kwargs):
 
 def logistic_regression_with_args(*arg, **kwargs):
     kwargs['max_iter'] = 1e3
-    kwargs['solver'] = 'saga'
+    kwargs['solver'] = 'lbfgs'
     kwargs['random_state'] = 1234
     return LogisticRegression(*arg, **kwargs)
 
