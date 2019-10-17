@@ -315,20 +315,9 @@ def content_features_of_task2(list_of_T, features_of_task2, users_of_task2, post
 
 
 def _fill_nan(features):
+    # Cannot train NaN or infinite.
     if 'time_for_first_ans' in features.columns and np.isnan(features.time_for_first_ans).sum(0):
         features.time_for_first_ans = 1 / features.time_for_first_ans
-        # features.time_for_first_ans = features.time_for_first_ans.replace([np.nan, np.inf, -np.inf], 0)
-
-    # fill_constants = {
-    #     'accepted_answerer_rep': 0,
-    #     'max_rep_answerer': 0,
-    #     'num_que_answered': 0,
-    #     'rep_questioner': 0,
-    #     'rep_answerers': 0,
-    #     'rep_co_answerers': 0,
-    #     'num_answers_recvd': 0
-    # }
-    # return features.fillna(fill_constants)
     return features.replace([np.nan, np.inf, -np.inf], 0)
 
 
