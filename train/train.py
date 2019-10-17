@@ -1,8 +1,7 @@
+import time
 import numpy as np
-
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import KFold
-
 import warnings
 
 from train.train_config import training_models, analysis_feature_names, train_seed
@@ -31,6 +30,8 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
     X = data[train_features]
     y = data[target]
 
+    start_time = time.time()
+
     # 10-fold cross validation
     acc_list = []
     kf = KFold(n_splits=10, shuffle=True, random_state=seed)
@@ -44,6 +45,10 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
         pred = mdl.predict(X_test)
         acc = (pred == y_test)
         acc_list.append(sum(acc) * 100 / len(acc))
+
+    end_time = time.time()
+    print('Training time:', round(end_time - start_time, 8), 's')
+
     return acc_list
 
 
