@@ -22,7 +22,7 @@ def main():
     list_of_K = range(1, 21)
     list_of_T = [7, 15, 30]
 
-    dataset_name = args.s if args.s else 'small'
+    dataset_name = args.s if args.s else 'full'
     users_df, posts_df = load_dataset(dataset_name)
     preprocess(users_df, posts_df)
 
@@ -84,9 +84,11 @@ def main():
 
     task1_accuracy_of_category = train.measure_task1_accuracy_of_category(list_of_K, features_of_task1)
     analysis_train.plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
+    analysis_train.plot_multi_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
 
     task2_accuracy_of_category = train.measure_task2_accuracy_of_category(list_of_T, features_of_task2)
     analysis_train.plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
+    analysis_train.plot_multi_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
 
     # Training and measure performance on each feature
     task1_accuracy_with_time_gap = train.performance_on_temporal(list_of_K, features_of_task1)
