@@ -19,7 +19,7 @@ def getTask1Users(users, posts, K):
 #   Users: Extract users who post at least 1
 #   Posts: Extract posts which create before T day from the account creation of the owner
 def getTask2Posts(users, posts, T=30):
-    return posts[(posts.CreationDate - posts.CreationDateOfOwner).dt.days <= T]
+    return posts[posts.CreationDate <= (posts.CreationDateOfOwner + Day(T))]
 
 
 def getTask2Users(users, posts):
@@ -39,10 +39,12 @@ def getTask1Labels(users, posts, K):
     posts_k = posts_k.merge(posts_k_next, how='left', on='OwnerUserId')
     posts_k.CreationDate = posts_k.CreationDate.fillna(pd.to_datetime('2100-12-31'))
 
-    users['is_churn'] = 0
+    users_k = users[users.numPosts >= K]
+    users_k = users_k.drop(users_k.columns, axis=1)
+    users_k['is_churn'] = 0
     # If creation date of K + 1 post is in deadline, the user is a stayer.
-    users.loc[posts_k[posts_k.CreationDate > posts_k.Deadline].OwnerUserId, 'is_churn'] = 1
-    return users
+    users_k.loc[posts_k[posts_k.CreationDate > posts_k.Deadline].OwnerUserId, 'is_churn'] = 1
+    return users_k
 
 
 # Churn in Task2
@@ -54,12 +56,13 @@ def getTask2Labels(users, posts, T=30):
     deadline_t = posts.CreationDateOfOwner + Day(T)
     deadline_churn = deadline_t + DateOffset(months=6)
 
-    posts_t = posts[(posts.CreationDate <= deadline_t) & (posts.CreationDate >= posts.CreationDateOfOwner)]
+    posts_t = posts[posts.CreationDate <= deadline_t]
     posts_t_users = posts_t.OwnerUserId.unique()
     posts_after_t = posts[(posts.CreationDate <= deadline_churn) & (posts.CreationDate > deadline_t) &
                           (posts.OwnerUserId.isin(posts_t_users))]
 
     users_t = users.loc[posts_t_users]
+    users_t = users_t.drop(users_t.columns, axis=1)
     users_t['is_churn'] = 1
     # If there are posts after T in deadline, the user is a stayer.
     users_t.loc[posts_after_t.OwnerUserId, 'is_churn'] = 0
