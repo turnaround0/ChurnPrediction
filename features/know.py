@@ -5,8 +5,9 @@ def prepareKnowledgeFeaturesOfTask1(users, posts, all_posts):
     all_answers = all_posts[all_posts.PostTypeId == 2][['OwnerUserId', 'ParentId', 'CreationDate']]
     all_answers.columns = ['AnswerUserId', 'QuestionId', 'CreationDateA']
 
-    questions = posts[posts.PostTypeId == 1][['OwnerUserId', 'AcceptedAnswerId', 'AnswerCount', 'CreationDate']]\
-        .rename(columns={'OwnerUserId': 'QuestionUserId', 'CreationDate': 'CreationDateQ'})
+    questions = posts[posts.PostTypeId == 1][
+        ['OwnerUserId', 'AcceptedAnswerId', 'AnswerCount', 'CreationDate']
+    ].rename(columns={'OwnerUserId': 'QuestionUserId', 'CreationDate': 'CreationDateQ'})
     all_questions = all_posts[all_posts.PostTypeId == 1][
         ['OwnerUserId', 'AcceptedAnswerId', 'AnswerCount', 'CreationDate']
     ].rename(columns={'OwnerUserId': 'QuestionUserId', 'CreationDate': 'CreationDateQ'})
@@ -36,23 +37,23 @@ def prepareKnowledgeFeaturesOfTask2(users, posts):
 
 
 # Knowledge features 1: accepted_answerer_rep
-def getRepOfAcceptedAnswerer(users, answers, questions, qnta, tqna):
+def getRepOfAcceptedAnswerer(qnta):
     return qnta[qnta.AcceptedAnswerId == qnta.index].groupby('QuestionUserId').Reputation.max()
 
 
 # Knowledge features 2: max_rep_answerer
-def getMaxRepAmongAnswerer(users, answers, questions, qnta, tqna):
+def getMaxRepAmongAnswerer(qnta):
     return qnta.groupby('QuestionUserId').Reputation.max()
 
 
 # Knowledge features 3: num_que_answered
-def getNumQueAnswered(users, answers, questions, qnta, tqna):
+def getNumQueAnswered(questions):
     # number of questions posted by the user that got answered
     return questions[questions.AnswerCount > 0].groupby('QuestionUserId').size()
 
 
 # Knowledge features 4: time_for_first_ans
-def getTimeForFirstAns(users, answers, questions, qnta, tqna):
+def getTimeForFirstAns(questions, qnta):
     tmp = qnta[qnta.CreationDateQ < qnta.CreationDateA]
     tmp['time_for_ans'] = (tmp.CreationDateA - tmp.CreationDateQ).dt.total_seconds() / 60
     questions['time_for_first_ans'] = tmp.groupby('QuestionId').time_for_ans.min()
@@ -60,19 +61,19 @@ def getTimeForFirstAns(users, answers, questions, qnta, tqna):
 
 
 # Knowledge features 5: rep_questioner
-def getAvgRepOfQuestioner(users, answers, questions, qnta, tqna):
+def getAvgRepOfQuestioner(tqna):
     # Avg. reputation of the user whose question was answered
     return tqna.groupby('AnswerUserId').Reputation.mean()
 
 
 # Knowledge features 6: rep_answerers
-def getAvgRepOfAnswerer(users, answers, questions, qnta, tqna):
+def getAvgRepOfAnswerer(qnta):
     # Avg. reputation of the users who answered the question
     return qnta.groupby('QuestionUserId').Reputation.mean()
 
 
 # Knowledge features 7: rep_co_answerers
-def getAvgRepOfCoAnswerer(users, answers, questions, qnta, tqna):
+def getAvgRepOfCoAnswerer(users, answers, questions):
     rep_ans = answers.merge(questions, left_on='QuestionId', right_index=True)\
         .merge(users[['Reputation']], left_on='AnswerUserId', right_index=True)
     avg_rep_ans = rep_ans.groupby('QuestionId').Reputation.mean()
@@ -81,5 +82,5 @@ def getAvgRepOfCoAnswerer(users, answers, questions, qnta, tqna):
 
 
 # Knowledge features 8: num_answers_received
-def getAvgNumAnsRecvd(users, answers, questions, qnta, tqna):
+def getAvgNumAnsRecvd(questions):
     return questions.groupby('QuestionUserId').AnswerCount.mean()
