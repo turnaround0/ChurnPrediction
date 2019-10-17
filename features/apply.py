@@ -294,8 +294,8 @@ def content_features_of_task1(list_of_K, features_of_task1, users_of_task1, post
 
     for K in list_of_K:
         users, posts = users_of_task1[K], posts_of_task1[K]
-        features_of_task1[K]['ans_comments'] = content.getLengthOfAnswers(posts)
-        features_of_task1[K]['que_comments'] = content.getLengthOfQuestions(posts)
+        features_of_task1[K]['ans_length'] = content.getLengthOfAnswers(posts)
+        features_of_task1[K]['que_length'] = content.getLengthOfQuestions(posts)
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
@@ -307,8 +307,8 @@ def content_features_of_task2(list_of_T, features_of_task2, users_of_task2, post
 
     for T in list_of_T:
         users, posts = users_of_task2[T], posts_of_task2[T]
-        features_of_task2[T]['ans_comments'] = content.getLengthOfAnswers(posts)
-        features_of_task2[T]['que_comments'] = content.getLengthOfQuestions(posts)
+        features_of_task2[T]['ans_length'] = content.getLengthOfAnswers(posts)
+        features_of_task2[T]['que_length'] = content.getLengthOfQuestions(posts)
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
