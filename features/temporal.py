@@ -33,5 +33,6 @@ def getTimeSinceLastPost(users, posts, T):
 def getTimeMeanGap(posts):
     last_dates = posts.groupby('OwnerUserId').CreationDate.last()
     first_dates = posts.groupby('OwnerUserId').CreationDate.first()
-    num_posts = posts.groupby('OwnerUserId').size()
-    return (last_dates - first_dates).dt.total_seconds() / 60 / num_posts
+    steps = posts.groupby('OwnerUserId').size() - 1
+    # If number of posts is 1 (last == first), the result is 0/0 => NaN.
+    return (last_dates - first_dates).dt.total_seconds() / 60 / steps
