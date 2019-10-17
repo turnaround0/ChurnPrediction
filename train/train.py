@@ -78,7 +78,7 @@ def performance_on_task1(list_of_K, features_of_task1):
 
 def performance_on_task2(list_of_T, features_of_task2):
     # Table 3: Performance on Task 2
-    drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate']
+    drop_user_columns = ['Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
     acc_models = {}
 
     for model_name in training_models:
