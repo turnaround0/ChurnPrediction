@@ -3,8 +3,8 @@ from train import train_models
 
 training_models = {
     'Decision Tree': DecisionTreeClassifier,
-    # 'SVM (Linear)': train_models.linear_svc_with_args,
-    # 'SVM (RBF)': train_models.svc_with_args,
+    'SVM (Linear)': train_models.linear_svc_with_args,
+    'SVM (RBF)': train_models.svc_with_args,
     'Logistic Regression': train_models.logistic_regression_with_args,
 }
 
