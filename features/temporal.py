@@ -5,7 +5,7 @@ import pandas as pd
 def getTimeGap1OfUser(users, posts):
     # CreationDateOfOwner of users is merged to posts dataframe when preprocessing data
     posts_first = posts.groupby('OwnerUserId').first()
-    return (posts_first.CreationDate - posts_first.CreationDateOfOwner).dt.total_seconds()
+    return (posts_first.CreationDate - posts_first.CreationDateOfOwner).dt.total_seconds() / 60
 
 
 # Temporal features 2: gapK
@@ -24,15 +24,15 @@ def getTimeLastGapOfPosts(posts):
 
 # Temporal features 4: time_since_last_post
 def getTimeSinceLastPost(users, posts, T):
-    last_dates = posts.groupby('OwnerUserId').CreationDate.nth(-1)
+    last_dates = posts.groupby('OwnerUserId').CreationDate.last()
     deadline_t = users.CreationDate + pd.offsets.Day(T)
     return (deadline_t - last_dates).dt.total_seconds() / 60
 
 
 # Temporal features 5: mean_gap
 def getTimeMeanGap(posts):
-    last_dates = posts.groupby('OwnerUserId').CreationDate.nth(-1)
+    last_dates = posts.groupby('OwnerUserId').CreationDate.last()
     first_dates = posts.groupby('OwnerUserId').CreationDate.first()
-    # TODO: need to check whether num_posts - 1 or num_post
+    # need to check whether num_posts - 1 or num_post
     num_posts = posts.groupby('OwnerUserId').size()
     return (last_dates - first_dates).dt.total_seconds() / 60 / num_posts
