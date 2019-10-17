@@ -53,8 +53,9 @@ def getNumQueAnswered(users, answers, questions, qnta, tqna):
 
 # Knowledge features 4: time_for_first_ans
 def getTimeForFirstAns(users, answers, questions, qnta, tqna):
-    qnta['time_for_ans'] = (qnta.CreationDateA - qnta.CreationDateQ).dt.total_seconds() / 60
-    questions['time_for_first_ans'] = qnta[qnta.time_for_ans >= 0].groupby('QuestionId').time_for_ans.min()
+    tmp = qnta[qnta.CreationDateQ < qnta.CreationDateA]
+    tmp['time_for_ans'] = (tmp.CreationDateA - tmp.CreationDateQ).dt.total_seconds() / 60
+    questions['time_for_first_ans'] = tmp.groupby('QuestionId').time_for_ans.min()
     return questions.groupby('QuestionUserId').time_for_first_ans.mean()
 
 
