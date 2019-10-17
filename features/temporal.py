@@ -10,9 +10,9 @@ def getTimeGap1OfUser(users, posts):
 
 # Temporal features 2: gapK
 def getTimeGapkOfPosts(posts, k):
-    posts_k_m1_dates = posts[posts.ith == k - 1].set_index('OwnerUserId').CreationDate
+    posts_k_minus_1_dates = posts[posts.ith == k - 1].set_index('OwnerUserId').CreationDate
     posts_k_dates = posts[posts.ith == k].set_index('OwnerUserId').CreationDate
-    return (posts_k_dates - posts_k_m1_dates).dt.total_seconds() / 60
+    return (posts_k_dates - posts_k_minus_1_dates).dt.total_seconds() / 60
 
 
 # Temporal features 3: last_gap
@@ -33,6 +33,5 @@ def getTimeSinceLastPost(users, posts, T):
 def getTimeMeanGap(posts):
     last_dates = posts.groupby('OwnerUserId').CreationDate.last()
     first_dates = posts.groupby('OwnerUserId').CreationDate.first()
-    # need to check whether num_posts - 1 or num_post
     num_posts = posts.groupby('OwnerUserId').size()
     return (last_dates - first_dates).dt.total_seconds() / 60 / num_posts
