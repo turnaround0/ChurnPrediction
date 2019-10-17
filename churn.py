@@ -24,7 +24,7 @@ def main():
 
     dataset_name = args.s if args.s else 'full'
     users_df, posts_df = load_dataset(dataset_name)
-    preprocess(users_df, posts_df)
+    users_df, posts_df = preprocess(users_df, posts_df)
 
     # Featuring from dataset
     if args.r:
