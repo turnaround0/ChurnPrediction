@@ -45,7 +45,7 @@ def plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, is_display=Fals
         ax.bar(index, predictions, tick_label=list_of_K, align='center')
         ax.set_title(title)
         ax.set_xlim(-1, n_groups)
-        ax.set_ylim(50, 80)
+        ax.set_ylim(40, 80)
         fig.savefig('output/figure5_task1_{}.png'.format(title))
         if is_display:
             plt.show()
@@ -63,7 +63,7 @@ def plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, is_display=Fals
         ax.bar(index, predictions, tick_label=list_of_T, align='center')
         ax.set_title(title)
         ax.set_xlim(-1, n_groups)
-        ax.set_ylim(50, 80)
+        ax.set_ylim(40, 80)
         fig.savefig('output/figure5_task2_{}.png'.format(title))
         if is_display:
             plt.show()
@@ -84,7 +84,7 @@ def plot_multi_figure5_of_task1(list_of_K, task1_accuracy_of_category, is_displa
         ax.bar(index, predictions, tick_label=list_of_K, align='center')
         ax.set_title(title)
         ax.set_xlim(-1, n_groups)
-        ax.set_ylim(50, 80)
+        ax.set_ylim(40, 80)
 
     fig.suptitle('Classification accuracy for each feature class')
     fig.text(0.5, 0.04, 'Number of observation posts (K)', ha='center')
@@ -109,7 +109,7 @@ def plot_multi_figure5_of_task2(list_of_T, task2_accuracy_of_category, is_displa
         ax.bar(index, predictions, tick_label=list_of_T, align='center')
         ax.set_title(title)
         ax.set_xlim(-1, n_groups)
-        ax.set_ylim(50, 80)
+        ax.set_ylim(40, 80)
 
     fig.suptitle('Classification accuracy for each feature class')
     fig.text(0.5, 0.04, 'Observation period in days (T)', ha='center')
