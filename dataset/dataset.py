@@ -191,4 +191,11 @@ def restore_features(list_of_K, list_of_T, file_type='csv'):
 
 def preprocess(users, posts):
     print('*** Preprocess ***')
+    start_time = time.time()
+
     users['numPosts'] = posts.groupby('OwnerUserId').size()
+    posts = posts[posts.OwnerUserId.isin(users.index)]
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+    return users, posts
