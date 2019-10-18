@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import pandas as pd
 from features import temporal, tasks, freq, know, quality, consistency, speed, gratitude, content, compet
 
 
@@ -314,9 +315,18 @@ def content_features_of_task2(list_of_T, features_of_task2, users_of_task2, post
 
 def _fill_nan(features):
     # Cannot train NaN or infinite.
-    if 'time_for_first_ans' in features.columns and np.isnan(features.time_for_first_ans).sum(0):
+    if 'time_for_first_ans' in features.columns:
         features.time_for_first_ans = 1 / features.time_for_first_ans
-    return features.replace([np.nan, np.inf, -np.inf], 0)
+
+    # All NaN is set to 0
+    features = features.fillna(0)
+
+    # All Inf is set to maximum value in the column
+    features = features.replace([np.inf], np.nan)   # to remove when getting max
+    for col in features.columns:
+        features[col] = features[col].fillna(features[col].max())
+
+    return features
 
 
 def fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2):
