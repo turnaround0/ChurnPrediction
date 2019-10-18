@@ -9,7 +9,7 @@ from train.train_config import training_models, analysis_feature_names, train_se
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
-def init():
+def random_init():
     np.random.seed(train_seed)
 
 
@@ -18,6 +18,9 @@ def do_under_sampling(y_train):
     stayers = y_train[y_train == 0].index
     n_churn, n_stay = len(churners), len(stayers)
 
+    # Before calling random.choice, random seed should set
+    # for getting same dataset for each test
+    random_init()
     if n_churn > n_stay:
         churners = np.random.choice(churners, n_stay, replace=False)
     else:
