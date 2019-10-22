@@ -21,18 +21,21 @@ def do_under_sampling(y_train):
     # Before calling random.choice, random seed should set
     # for getting same dataset for each test
     random_init()
-    if n_churn > n_stay:
-        churners = np.random.choice(churners, n_stay, replace=False)
-    else:
-        stayers = np.random.choice(stayers, n_churn, replace=False)
+    # Maximum number of training samples is 20,000 due to training speed.
+    num_max_choice = 10000
+    num_choice = n_churn if n_churn < n_stay else n_stay
+    num_choice = num_choice if num_choice < num_max_choice else num_max_choice
+
+    churners = np.random.choice(churners, num_choice, replace=False)
+    stayers = np.random.choice(stayers, num_choice, replace=False)
 
     return np.array(list(churners) + list(stayers))
 
 
 def learn_model(data, train_features, target='is_churn', model=DecisionTreeClassifier, seed=1234):
+    print('train_features:', train_features)
     X = data[train_features]
     y = data[target]
-
     start_time = time.time()
 
     # 10-fold cross validation
@@ -111,6 +114,9 @@ def measure_task1_accuracy_of_category(list_of_K, features_of_task1):
                 feature_list = ['gap{}'.format(j) for j in range(1, K + 1)]
             elif name == 'Frequency':
                 feature_list = [feat for feat in feature_list if feat != 'num_posts']
+            elif name == 'All':
+                if K > 1:
+                    feature_list = feature_list + ['gap{}'.format(K)]
 
             train_features = [feat for feat in feature_list if feat in features_of_task1[K].columns]
             if len(train_features) == 0:
