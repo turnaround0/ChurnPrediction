@@ -3,7 +3,7 @@ import argparse
 import warnings
 from pandas.core.common import SettingWithCopyWarning
 
-from dataset.dataset import load_dataset, preprocess, store_features, restore_features
+from dataset.dataset import load_dataset, preprocess, store_features, restore_features, print_stats
 from features import apply
 from analysis import analysis_features, analysis_train
 from train import train
@@ -72,6 +72,8 @@ def main():
         store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
     apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
+
+    print_stats(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
     # Training and measure performance on each task
     train.random_init()
