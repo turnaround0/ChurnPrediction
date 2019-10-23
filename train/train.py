@@ -74,7 +74,7 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
     kf = KFold(n_splits=10, shuffle=True, random_state=seed)
     for train_index, test_index in kf.split(X):
         X_test, y_test = X.iloc[test_index], y.iloc[test_index]
-        # train_index = do_under_sampling(y.iloc[train_index])
+        train_index = do_under_sampling(y.iloc[train_index])
         X_train, y_train = X.reindex(train_index), y.reindex(train_index)
 
         # Learn Model
