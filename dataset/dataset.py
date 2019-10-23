@@ -199,3 +199,28 @@ def preprocess(users, posts):
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
     return users, posts
+
+
+def _print_stats(list_of_items, features):
+    data_list = []
+    for item in list_of_items:
+        count = features[item].groupby('is_churn').size()
+        percentage = round(count[0] / (count[0] + count[1]) * 100, 4)
+        ratio = str(round(count[0] / count[1], 4)) + ':1'
+
+        data_list.append((item, count[1], count[0], percentage, str(ratio)))
+        print('#', item, 'Churn:', count[1], 'Stay:', count[0], 'Percentage:', percentage, 'Ratio:', ratio)
+
+    df = pd.DataFrame(data_list)
+    df.columns = ['Id', 'Churner', 'Stayer', 'Stayer percentage', 'Ratio (Stayer:Churner)']
+    return df.set_index('Id')
+
+
+def print_stats(list_of_K, list_of_T, features_of_task1, features_of_task2):
+    print('\nDataset characteristic by K')
+    df_k = _print_stats(list_of_K, features_of_task1).rename_axis('K')
+    df_k.to_csv('output/dataset_char_K.csv')
+
+    print('\nDataset characteristic by T')
+    df_t = _print_stats(list_of_T, features_of_task2).rename_axis('T')
+    df_t.to_csv('output/dataset_char_T.csv')
