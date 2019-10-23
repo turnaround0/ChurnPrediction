@@ -26,7 +26,7 @@ class DecisionTreeExtClassifier:
                 else:
                     fit_list.append(fit_list[0])
                 ext_len = rest
-                u_value = 0
+                u_value = 1
                 rest = 0
             else:
                 model = self.model.fit(x, y)
@@ -36,10 +36,9 @@ class DecisionTreeExtClassifier:
                 df_pred = pd.DataFrame(pred)
                 df_pred.columns = ['false', 'true']
 
-                # criterion = (df_pred.true - df_pred.false).abs().to_frame()
-                criterion = (df_pred.true - df_pred.true.pow(2)).to_frame()
+                criterion = (df_pred.true * df_pred.false).to_frame()
                 criterion.columns = ['criterion']
-                df_ext = criterion.sort_values('criterion', ascending=False)
+                df_ext = criterion.sort_values('criterion', ascending=True)
 
                 cut_len = round(rest * self.p_value)
                 df_cut_ext = df_ext.iloc[: cut_len]
@@ -70,8 +69,7 @@ class DecisionTreeExtModel:
             pred = model.predict_proba(x)
             df_pred = pd.DataFrame(pred)
             df_pred.columns = ['false', 'true']
-            # meet = (df_pred.true - df_pred.false).abs() >= u_value
-            meet = (df_pred.true - df_pred.true.pow(2)) >= u_value
+            meet = (df_pred.true * df_pred.false <= u_value)
 
             if idx == 0:
                 final_pred = df_pred.true

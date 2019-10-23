@@ -11,8 +11,9 @@ warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 def decision_tree_classifier_with_args(*arg, **kwargs):
     kwargs['random_state'] = 1234
-    # Below parameter is critical for this test
     kwargs['min_samples_split'] = 0.05
+    kwargs['min_samples_leaf'] = 0.03
+    kwargs['max_depth'] = 10
     return DecisionTreeClassifier(*arg, **kwargs)
 
 
@@ -39,7 +40,8 @@ def linear_svc_with_args(*args, **kwargs):
 def decision_tree_ext_method(*args, **kwargs):
     kwargs['random_state'] = 1234
     kwargs['min_samples_split'] = 0.05
-    kwargs['min_samples_leaf'] = 500
-    kwargs['max_round'] = 10
-    kwargs['p_value'] = 0.1
+    kwargs['min_samples_leaf'] = 0.03
+    kwargs['max_depth'] = 10
+    kwargs['max_round'] = 4
+    kwargs['p_value'] = 0.2
     return DecisionTreeExtClassifier(*args, **kwargs)
