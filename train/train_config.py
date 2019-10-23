@@ -2,9 +2,9 @@ from train import train_models
 
 training_models = {
     'Decision Tree': train_models.decision_tree_classifier_with_args,
-    'SVM (Linear)': train_models.linear_svc_with_args,
-    'SVM (RBF)': train_models.svc_with_args,
-    'Logistic Regression': train_models.logistic_regression_with_args,
+    # 'SVM (Linear)': train_models.linear_svc_with_args,
+    # 'SVM (RBF)': train_models.svc_with_args,
+    # 'Logistic Regression': train_models.logistic_regression_with_args,
 }
 
 temporal_features = ['gap1', 'last_gap', 'time_since_last_post', 'mean_gap']
