@@ -45,10 +45,12 @@ def calc_stats(stats_list):
     else:
         f1_score = round(2 * (precision * recall) / (precision + recall), 4)
 
-    print('Acc:', accuracy, 'Churn Acc:', churn_accuracy, 'Stay Acc:', stay_accuracy,
-          'Precision:', precision, 'Recall:', recall, 'F1 score:', f1_score)
-
-    return accuracy, churn_accuracy, stay_accuracy, precision, recall, f1_score
+    stats = {
+        'Acc': accuracy, 'Churn Acc': churn_accuracy, 'Stay Acc': stay_accuracy,
+        'Precision': precision, 'Recall': recall, 'F1 score': f1_score
+    }
+    print(stats)
+    return stats
 
 
 def get_avg_stats(stats_list):
@@ -96,22 +98,16 @@ def learn_model(data, train_features, target='is_churn', model=DecisionTreeClass
     return acc_list, get_avg_stats(stats_list)
 
 
-def store_stats(name, model_name, index_name, list_of_items, stats_model_list):
-    df = pd.DataFrame(stats_model_list).rename_axis(index_name)
-    df.columns = ['Acc', 'Churner Acc', 'Stayer Acc', 'Precision', 'Recall', 'F1 score']
-    df.index = list_of_items
-    df.to_csv('output/stats_on_' + name + '_' + model_name.lower().replace(' ', '_') + '.csv')
-
-
 def performance_on_task1(list_of_K, features_of_task1):
     # Table 2: Performance on Task 1
     drop_user_columns = ['Id', 'Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
     acc_models = {}
+    stats_models = {}
 
     for model_name in training_models:
         model = training_models[model_name]
         acc_models[model_name] = {}
-        stats_model_list = []
+        stats_models[model_name] = {}
         print('\nTraining model name:', model_name)
 
         for K in list_of_K:
@@ -123,22 +119,21 @@ def performance_on_task1(list_of_K, features_of_task1):
             acc_mean = np.mean(acc_list)
             acc_models[model_name][K] = acc_mean
             print('Accuracy: {}'.format(acc_mean))
-            stats_model_list.append(calc_stats(stats_list))
+            stats_models[model_name][K] = calc_stats(stats_list)
 
-        store_stats('task1', model_name, 'K(posts)', list_of_K, stats_model_list)
-
-    return acc_models
+    return acc_models, stats_models
 
 
 def performance_on_task2(list_of_T, features_of_task2):
     # Table 3: Performance on Task 2
     drop_user_columns = ['Id', 'Reputation', 'CreationDate', 'LastAccessDate', 'numPosts']
     acc_models = {}
+    stats_models = {}
 
     for model_name in training_models:
         model = training_models[model_name]
         acc_models[model_name] = {}
-        stats_model_list = []
+        stats_models[model_name] = {}
         print('\nTraining model name:', model_name)
 
         for T in list_of_T:
@@ -149,12 +144,10 @@ def performance_on_task2(list_of_T, features_of_task2):
             acc_list, stats_list = learn_model(features_of_task2[T], train_features, model=model)
             acc_mean = np.mean(acc_list)
             acc_models[model_name][T] = acc_mean
+            stats_models[model_name][T] = calc_stats(stats_list)
             print('Accuracy: {}'.format(acc_mean))
-            stats_model_list.append(calc_stats(stats_list))
 
-        store_stats('task2', model_name, 'T(days)', list_of_T, stats_model_list)
-
-    return acc_models
+    return acc_models, stats_models
 
 
 def measure_task1_accuracy_of_category(list_of_K, features_of_task1):
