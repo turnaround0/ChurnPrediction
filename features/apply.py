@@ -312,6 +312,34 @@ def content_features_of_task2(list_of_T, features_of_task2, users_of_task2, post
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
 
+def answering_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
+    print('*** Content features of task1 ***')
+    start_time = time.time()
+
+    for K in list_of_K:
+        users, posts = users_of_task1[K], posts_of_task1[K]
+        answers, questions, qnta, tqna = preprocessForKnowledgeFeaturesForTask1(users, posts, posts_df)
+        features_of_task1[K]['num_of_ans_count'] = answering.getAvgNumOfAnswerCount(users, answers, questions,  qnta, tqna)
+        features_of_task1[K]['first_post_type'] = answering.getFirstPostType(posts)
+        features_of_task1[K]['total_comment'] = answering.getTotalNumOfComments(users, answers, questions,  qnta, tqna)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def answering_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Content features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        answers, questions, qna, qna1 = preprocessForKnowledgeFeaturesForTask2(users, posts)
+        features_of_task2[T]['num_of_ans_count'] = answering.etAvgNumOfAnswerCount(users, answers, questions, qna, qna1)
+        features_of_task2[T]['first_post_type'] = answering.etFirstPostType(posts)
+        features_of_task2[T]['total_comment'] = answering.etTotalNumOfComments(users, answers, questions, qna, qna1)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
 
 def _fill_nan(features):
     # Cannot train NaN or infinite.
