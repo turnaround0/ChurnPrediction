@@ -8,7 +8,7 @@ class DecisionTreeExtClassifier:
         self.max_round = kwargs.pop('max_round')
         self.p_value = kwargs.pop('p_value')
         self.kwargs = kwargs
-        self.model = DecisionTreeClassifier(*args, **kwargs)
+        self.args = args
 
     def fit(self, src_x, src_y):
         fit_list = []
@@ -29,7 +29,7 @@ class DecisionTreeExtClassifier:
                 u_value = 1
                 rest = 0
             else:
-                model = self.model.fit(x, y)
+                model = DecisionTreeClassifier(*self.args, **self.kwargs).fit(x, y)
                 fit_list.append(model)
 
                 pred = model.predict_proba(x)
@@ -44,13 +44,17 @@ class DecisionTreeExtClassifier:
                 df_cut_ext = df_ext.iloc[: cut_len]
                 u_value = df_cut_ext.iloc[-1].criterion
 
+                df_rest_ext = df_ext.iloc[cut_len:]
+                df_rest_ext = df_rest_ext[df_rest_ext.criterion == u_value]
+                df_cut_ext = pd.concat([df_cut_ext, df_rest_ext])
+
                 x = x.drop(df_cut_ext.index).reset_index(drop=True)
                 y = y.drop(df_cut_ext.index).reset_index(drop=True)
                 ext_len = len(df_cut_ext)
                 rest -= ext_len
 
             u_list.append(u_value)
-            print('Train) Round, u value, rest, number of extraction:', idx, u_value, rest, ext_len)
+            # print('Train) Round, u value, rest, number of extraction:', idx, u_value, rest, ext_len)
 
         return DecisionTreeExtModel(self.max_round, self.p_value, zip(fit_list, u_list))
 
@@ -85,7 +89,7 @@ class DecisionTreeExtModel:
                 rest = 0
             else:
                 rest -= meet.sum()
-            print('Prediction) Round, u value, rest, meet count:', idx, u_value, rest, meet.sum())
+            # print('Prediction) Round, u value, rest, meet count:', idx, u_value, rest, meet.sum())
 
         final_pred[final_pred >= 0.5] = 1
         final_pred[final_pred < 0.5] = 0
