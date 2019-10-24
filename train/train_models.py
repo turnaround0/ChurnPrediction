@@ -38,6 +38,6 @@ def linear_svc_with_args(*args, **kwargs):
 def decision_tree_ext_method(*args, **kwargs):
     kwargs['random_state'] = 1234
     kwargs['min_samples_leaf'] = 100
-    kwargs['max_round'] = 10
+    kwargs['max_round'] = 7
     kwargs['p_value'] = 0.1
     return DecisionTreeExtClassifier(*args, **kwargs)
