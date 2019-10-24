@@ -1,7 +1,7 @@
 import time
 import numpy as np
-import pandas as pd
-from features import temporal, tasks, freq, know, quality, consistency, speed, gratitude, content, compet, answering
+from features import temporal, tasks, freq, know, quality, consistency, speed,\
+    gratitude, content, compet, answering, hot
 
 
 def get_users_posts_of_task1(list_of_K, users, posts):
@@ -338,6 +338,18 @@ def answering_features_of_task2(list_of_T, features_of_task2, users_of_task2, po
         features_of_task2[T]['num_of_ans_count'] = answering.getAvgNumOfAnswerCount(qna1)
         features_of_task2[T]['first_post_type'] = answering.getFirstPostTypeIsAnswer(posts)
         features_of_task2[T]['total_comment'] = answering.getTotalNumOfComments(qna1)
+
+    end_time = time.time()
+    print('Processing time:', round(end_time - start_time, 8), 's')
+
+
+def hot_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
+    print('*** Hot features of task2 ***')
+    start_time = time.time()
+
+    for T in list_of_T:
+        users, posts = users_of_task2[T], posts_of_task2[T]
+        features_of_task2[T]['in_hot_topic'] = hot.getNumInHotTopic(posts)
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')

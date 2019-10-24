@@ -39,11 +39,14 @@ answering_features_1 = ['num_of_ans_count']
 answering_features_2 = ['first_post_type']
 answering_features_3 = ['total_comment']
 
+hot_features = ['in_hot_topic']
+
 additional_features = {
     'Answering': answering_features,
     'Answering_num_of_ans_count': answering_features_1,
     'Answering_first_post_type': answering_features_2,
     'Answering_total_comment': answering_features_3,
+    'Hot': hot_features,
 }
 
 train_seed = 1234

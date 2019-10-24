@@ -73,6 +73,8 @@ def main():
         apply.answering_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1, posts_df)
         apply.answering_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
 
+        apply.hot_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
         store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
     apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
