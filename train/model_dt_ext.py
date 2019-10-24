@@ -27,7 +27,6 @@ class DecisionTreeExtClassifier:
                     fit_list.append(fit_list[0])
                 ext_len = rest
                 u_value = 1
-                rest = 0
             else:
                 model = DecisionTreeClassifier(*self.args, **self.kwargs).fit(x, y)
                 fit_list.append(model)
@@ -51,8 +50,8 @@ class DecisionTreeExtClassifier:
                 x = x.drop(df_cut_ext.index).reset_index(drop=True)
                 y = y.drop(df_cut_ext.index).reset_index(drop=True)
                 ext_len = len(df_cut_ext)
-                rest -= ext_len
 
+            rest -= ext_len
             u_list.append(u_value)
             # print('Train) Round, u value, rest, number of extraction:', idx, u_value, rest, ext_len)
 
