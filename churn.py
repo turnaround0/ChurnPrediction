@@ -78,11 +78,15 @@ def main():
     # Training and measure performance on each task
     train.random_init()
 
-    acc_models = train.performance_on_task1(list_of_K, features_of_task1)
+    acc_models, stats_models = train.performance_on_task1(list_of_K, features_of_task1)
     analysis_train.plot_table2(list_of_K, acc_models)
+    analysis_train.plot_stats_f1_score_table2(list_of_K, stats_models)
+    analysis_train.plot_stats_table2(list_of_K, stats_models)
 
-    acc_models = train.performance_on_task2(list_of_T, features_of_task2)
+    acc_models, stats_models = train.performance_on_task2(list_of_T, features_of_task2)
     analysis_train.plot_table3(list_of_T, acc_models)
+    analysis_train.plot_stats_f1_score_table3(list_of_T, stats_models)
+    analysis_train.plot_stats_table3(list_of_T, stats_models)
 
     task1_accuracy_of_category = train.measure_task1_accuracy_of_category(list_of_K, features_of_task1)
     analysis_train.plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
