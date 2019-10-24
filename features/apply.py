@@ -126,7 +126,7 @@ def knowledge_features_of_task1(list_of_K, features_of_task1, users_of_task1, po
     for K in list_of_K:
         print("Extract knowledge features of task1( K =", K, ")")
         users, posts = users_of_task1[K], posts_of_task1[K]
-        answers, questions, qnta, tqna = know.prepareKnowledgeFeaturesOfTask1(users, posts, posts_df)
+        answers, questions, qnta, tqna = know.prepareTask1(users, posts, posts_df)
         features_of_task1[K]['accepted_answerer_rep'] = know.getRepOfAcceptedAnswerer(qnta)
         features_of_task1[K]['max_rep_answerer'] = know.getMaxRepAmongAnswerer(qnta)
         features_of_task1[K]['num_que_answered'] = know.getNumQueAnswered(questions)
@@ -147,7 +147,7 @@ def knowledge_features_of_task2(list_of_T, features_of_task2, users_of_task2, po
     for T in list_of_T:
         print("Extract knowledge features of task2( T =", T, ")")
         users, posts = users_of_task2[T], posts_of_task2[T]
-        answers, questions, qna, qna1 = know.prepareKnowledgeFeaturesOfTask2(users, posts)
+        answers, questions, qna, qna1 = know.prepareTask2(users, posts)
         features_of_task2[T]['accepted_answerer_rep'] = know.getRepOfAcceptedAnswerer(qna)
         features_of_task2[T]['max_rep_answerer'] = know.getMaxRepAmongAnswerer(qna)
         features_of_task2[T]['num_que_answered'] = know.getNumQueAnswered(questions)
@@ -313,33 +313,31 @@ def content_features_of_task2(list_of_T, features_of_task2, users_of_task2, post
     print('Processing time:', round(end_time - start_time, 8), 's')
 
 
-def answering_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1):
-    print('*** Content features of task1 ***')
+def answering_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1, posts_df):
+    print('*** Answering features of task1 ***')
     start_time = time.time()
 
     for K in list_of_K:
         users, posts = users_of_task1[K], posts_of_task1[K]
-        answers, questions, qnta, tqna = preprocessForKnowledgeFeaturesForTask1(users, posts, posts_df)
-        features_of_task1[K]['num_of_ans_count'] =\
-            answering.getAvgNumOfAnswerCount(users, answers, questions,  qnta, tqna)
-        features_of_task1[K]['first_post_type'] = answering.getFirstPostType(posts)
-        features_of_task1[K]['total_comment'] =\
-            answering.getTotalNumOfComments(users, answers, questions,  qnta, tqna)
+        answers, questions, qnta, tqna = answering.prepareTask1(posts, posts_df)
+        features_of_task1[K]['num_of_ans_count'] = answering.getAvgNumOfAnswerCount(tqna)
+        features_of_task1[K]['first_post_type'] = answering.getFirstPostTypeIsAnswer(posts)
+        features_of_task1[K]['total_comment'] = answering.getTotalNumOfComments(tqna)
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
 
 
 def answering_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2):
-    print('*** Content features of task2 ***')
+    print('*** Answering features of task2 ***')
     start_time = time.time()
 
     for T in list_of_T:
         users, posts = users_of_task2[T], posts_of_task2[T]
-        answers, questions, qna, qna1 = preprocessForKnowledgeFeaturesForTask2(users, posts)
-        features_of_task2[T]['num_of_ans_count'] = answering.etAvgNumOfAnswerCount(users, answers, questions, qna, qna1)
-        features_of_task2[T]['first_post_type'] = answering.etFirstPostType(posts)
-        features_of_task2[T]['total_comment'] = answering.etTotalNumOfComments(users, answers, questions, qna, qna1)
+        answers, questions, qna, qna1 = answering.prepareTask2(posts)
+        features_of_task2[T]['num_of_ans_count'] = answering.getAvgNumOfAnswerCount(qna1)
+        features_of_task2[T]['first_post_type'] = answering.getFirstPostTypeIsAnswer(posts)
+        features_of_task2[T]['total_comment'] = answering.getTotalNumOfComments(qna1)
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
@@ -351,7 +349,8 @@ def _fill_nan(features):
         features.time_for_first_ans = 1 / features.time_for_first_ans
 
     # In case of relative_rank_pos, its NaN should set to 0
-    features.relative_rank_pos = features.relative_rank_pos.fillna(1)
+    if 'relative_rank_pos' in features.columns:
+        features.relative_rank_pos = features.relative_rank_pos.fillna(1)
 
     # All NaN is set to 0
     features = features.fillna(0)

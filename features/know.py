@@ -1,5 +1,5 @@
 # For the fast extraction, prepare questions x answers
-def prepareKnowledgeFeaturesOfTask1(users, posts, all_posts):
+def prepareTask1(users, posts, all_posts):
     answers = posts[posts.PostTypeId == 2][['OwnerUserId', 'ParentId', 'CreationDate']]
     answers.columns = ['AnswerUserId', 'QuestionId', 'CreationDateA']
     all_answers = all_posts[all_posts.PostTypeId == 2][['OwnerUserId', 'ParentId', 'CreationDate']]
@@ -23,7 +23,7 @@ def prepareKnowledgeFeaturesOfTask1(users, posts, all_posts):
 
 
 # For the fast extraction, prepare questions x answers
-def prepareKnowledgeFeaturesOfTask2(users, posts):
+def prepareTask2(users, posts):
     answers = posts[posts.PostTypeId == 2][['OwnerUserId', 'ParentId', 'CreationDate']]
     answers.columns = ['AnswerUserId', 'QuestionId', 'CreationDateA']
     questions = posts[posts.PostTypeId == 1][['OwnerUserId', 'AcceptedAnswerId', 'AnswerCount', 'CreationDate']]\

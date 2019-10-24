@@ -69,6 +69,10 @@ def main():
         apply.content_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1)
         apply.content_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
 
+        # Additional features
+        apply.answering_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1, posts_df)
+        apply.answering_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+
         store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
     apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
@@ -95,6 +99,13 @@ def main():
     task2_accuracy_of_category = train.measure_task2_accuracy_of_category(list_of_T, features_of_task2)
     analysis_train.plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
     analysis_train.plot_multi_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
+
+    # Additional feature tests
+    task1_accuracy_of_category = train.measure_task1_additional_features(list_of_K, features_of_task1)
+    analysis_train.plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
+
+    task2_accuracy_of_category = train.measure_task2_additional_features(list_of_T, features_of_task2)
+    analysis_train.plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
 
     # Training and measure performance on each feature
     task1_accuracy_with_time_gap = train.performance_on_temporal(list_of_K, features_of_task1)

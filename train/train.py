@@ -5,7 +5,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import KFold
 import warnings
 
-from train.train_config import training_models, analysis_feature_names, train_seed
+from train.train_config import training_models, analysis_feature_names, additional_features, train_seed
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
@@ -114,6 +114,10 @@ def performance_on_task1(list_of_K, features_of_task1):
             train_features = [col for col in features_of_task1[K].columns
                               if col not in drop_user_columns + ['is_churn']]
 
+            # Do not use additional features to train
+            for feature_list in additional_features.values():
+                train_features = [col for col in train_features if col not in feature_list]
+
             print('Task 1, K={}'.format(K))
             acc_list, stats_list = learn_model(features_of_task1[K], train_features, model=model)
             acc_mean = np.mean(acc_list)
@@ -139,6 +143,9 @@ def performance_on_task2(list_of_T, features_of_task2):
         for T in list_of_T:
             train_features = [col for col in features_of_task2[T].columns
                               if col not in drop_user_columns + ['is_churn']]
+
+            for feature_list in additional_features.values():
+                train_features = [col for col in train_features if col not in feature_list]
 
             print('Task 2, T={}'.format(T))
             acc_list, stats_list = learn_model(features_of_task2[T], train_features, model=model)
@@ -182,6 +189,46 @@ def measure_task1_accuracy_of_category(list_of_K, features_of_task1):
 def measure_task2_accuracy_of_category(list_of_T, features_of_task2):
     task2_accuracy_of_category = {}
     for name, feature_list in analysis_feature_names.items():
+        accuracy_of_category = []
+        for T in list_of_T:
+            train_features = [feat for feat in feature_list if feat in features_of_task2[T].columns]
+            if len(train_features) == 0:
+                continue
+
+            print('\n{}, Task 2, T={}'.format(name, T))
+            acc_list, _ = learn_model(features_of_task2[T], train_features)
+            mean_acc = np.mean(acc_list)
+            accuracy_of_category.append(mean_acc)
+            print('Accuracy: {}'.format(mean_acc))
+
+        task2_accuracy_of_category[name] = accuracy_of_category
+
+    return task2_accuracy_of_category
+
+
+def measure_task1_additional_features(list_of_K, features_of_task1):
+    task1_accuracy_of_category = {}
+    for name, feature_list in additional_features.items():
+        accuracy_of_category = []
+        for K in list_of_K:
+            train_features = [feat for feat in feature_list if feat in features_of_task1[K].columns]
+            if len(train_features) == 0:
+                continue
+
+            print('\n{}, Task 1, K={}'.format(name, K))
+            acc_list, _ = learn_model(features_of_task1[K], train_features)
+            mean_acc = np.mean(acc_list)
+            accuracy_of_category.append(mean_acc)
+            print('Accuracy: {}'.format(mean_acc))
+
+        task1_accuracy_of_category[name] = accuracy_of_category
+
+    return task1_accuracy_of_category
+
+
+def measure_task2_additional_features(list_of_T, features_of_task2):
+    task2_accuracy_of_category = {}
+    for name, feature_list in additional_features.items():
         accuracy_of_category = []
         for T in list_of_T:
             train_features = [feat for feat in feature_list if feat in features_of_task2[T].columns]

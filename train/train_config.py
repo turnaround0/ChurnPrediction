@@ -34,4 +34,16 @@ analysis_feature_names = {
     'All': all_features
 }
 
+answering_features = ['num_of_ans_count', 'first_post_type', 'total_comment']
+answering_features_1 = ['num_of_ans_count']
+answering_features_2 = ['first_post_type']
+answering_features_3 = ['total_comment']
+
+additional_features = {
+    'Answering': answering_features,
+    'Answering_num_of_ans_count': answering_features_1,
+    'Answering_first_post_type': answering_features_2,
+    'Answering_total_comment': answering_features_3,
+}
+
 train_seed = 1234
