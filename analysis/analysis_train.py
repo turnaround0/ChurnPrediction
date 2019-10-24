@@ -23,6 +23,52 @@ def plot_table3(list_of_T, acc_models):
     df.to_csv('output/table3.csv')
 
 
+def plot_stats_f1_score_table2(list_of_K, stats_models):
+    columns = ['k(posts)'] + list(stats_models.keys())
+    lines = []
+    for K in list_of_K:
+        lines.append([K] + [stats_models[model_name][K]['F1 score'] for model_name in stats_models.keys()])
+    df = pd.DataFrame(lines, columns=columns).set_index('k(posts)')
+    print(df)
+    df.to_csv('output/table2_f1.csv')
+
+
+def plot_stats_f1_score_table3(list_of_T, stats_models):
+    columns = ['T(days)'] + list(stats_models.keys())
+    lines = []
+    for T in list_of_T:
+        lines.append([T] + [stats_models[model_name][T]['F1 score'] for model_name in stats_models.keys()])
+    df = pd.DataFrame(lines, columns=columns).set_index('T(days)')
+    print(df)
+    df.to_csv('output/table3_f1.csv')
+
+
+def plot_stats_table2(list_of_K, stats_models):
+    for model_name in stats_models.keys():
+        stats_model = stats_models[model_name]
+
+        lines = []
+        columns = ['k(posts)'] + list(stats_model[list_of_K[0]].keys())
+        for K in list_of_K:
+            lines.append([K] + stats_model[K].values())
+        df = pd.DataFrame(lines, columns=columns).set_index('k(posts)')
+        print(df)
+        df.to_csv('output/stats_on_task1_' + model_name.lower().replace(' ', '_') + '.csv')
+
+
+def plot_stats_table3(list_of_T, stats_models):
+    for model_name in stats_models.keys():
+        stats_model = stats_models[model_name]
+
+        lines = []
+        columns = ['T(days)'] + list(stats_model[list_of_T[0]].keys())
+        for T in list_of_T:
+            lines.append([T] + stats_model[T].values())
+        df = pd.DataFrame(lines, columns=columns).set_index('T(days)')
+        print(df)
+        df.to_csv('output/stats_on_task2_' + model_name.lower().replace(' ', '_') + '.csv')
+
+
 def plot_table4(task1_accuracy_with_time_gap):
     # Table of temporal gap features analysis
     columns = ['k', 'Only gapK (Temporal Gaps)', 'Only last_gap (Last-Gap)']
