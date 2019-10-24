@@ -50,6 +50,7 @@ def plot_stats_f1_score_table3(list_of_T, stats_models):
 def plot_stats_table2(list_of_K, stats_models):
     print('\nTable 2. Stats')
     for model_name in stats_models.keys():
+        print('Model:', model_name)
         stats_model = stats_models[model_name]
         lines = []
         columns = ['k(posts)'] + list(stats_model[list_of_K[0]].keys())
@@ -63,8 +64,8 @@ def plot_stats_table2(list_of_K, stats_models):
 def plot_stats_table3(list_of_T, stats_models):
     print('\nTable 3. Stats')
     for model_name in stats_models.keys():
+        print('Model:', model_name)
         stats_model = stats_models[model_name]
-
         lines = []
         columns = ['T(days)'] + list(stats_model[list_of_T[0]].keys())
         for T in list_of_T:
