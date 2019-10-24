@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 
 def plot_table2(list_of_K, acc_models):
+    print('\nTable 2. Accuracy')
     columns = ['k(posts)'] + list(acc_models.keys())
     lines = []
     for K in list_of_K:
@@ -14,6 +15,7 @@ def plot_table2(list_of_K, acc_models):
 
 
 def plot_table3(list_of_T, acc_models):
+    print('\nTable 3. Accuracy')
     columns = ['T(days)'] + list(acc_models.keys())
     lines = []
     for T in list_of_T:
@@ -24,6 +26,7 @@ def plot_table3(list_of_T, acc_models):
 
 
 def plot_stats_f1_score_table2(list_of_K, stats_models):
+    print('\nTable 2. F1 Score')
     columns = ['k(posts)'] + list(stats_models.keys())
     lines = []
     for K in list_of_K:
@@ -34,6 +37,7 @@ def plot_stats_f1_score_table2(list_of_K, stats_models):
 
 
 def plot_stats_f1_score_table3(list_of_T, stats_models):
+    print('\nTable 3. F1 Score')
     columns = ['T(days)'] + list(stats_models.keys())
     lines = []
     for T in list_of_T:
@@ -44,26 +48,27 @@ def plot_stats_f1_score_table3(list_of_T, stats_models):
 
 
 def plot_stats_table2(list_of_K, stats_models):
+    print('\nTable 2. Stats')
     for model_name in stats_models.keys():
         stats_model = stats_models[model_name]
-
         lines = []
         columns = ['k(posts)'] + list(stats_model[list_of_K[0]].keys())
         for K in list_of_K:
-            lines.append([K] + stats_model[K].values())
+            lines.append([K] + list(stats_model[K].values()))
         df = pd.DataFrame(lines, columns=columns).set_index('k(posts)')
         print(df)
         df.to_csv('output/stats_on_task1_' + model_name.lower().replace(' ', '_') + '.csv')
 
 
 def plot_stats_table3(list_of_T, stats_models):
+    print('\nTable 3. Stats')
     for model_name in stats_models.keys():
         stats_model = stats_models[model_name]
 
         lines = []
         columns = ['T(days)'] + list(stats_model[list_of_T[0]].keys())
         for T in list_of_T:
-            lines.append([T] + stats_model[T].values())
+            lines.append([T] + list(stats_model[T].values()))
         df = pd.DataFrame(lines, columns=columns).set_index('T(days)')
         print(df)
         df.to_csv('output/stats_on_task2_' + model_name.lower().replace(' ', '_') + '.csv')
