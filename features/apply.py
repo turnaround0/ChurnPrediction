@@ -319,7 +319,7 @@ def _fill_nan(features):
         features.time_for_first_ans = 1 / features.time_for_first_ans
 
     # In case of relative_rank_pos, its NaN should set to 0
-    features = features.relative_rank_pos.fillna(1)
+    features.relative_rank_pos = features.relative_rank_pos.fillna(1)
 
     # All NaN is set to 0
     features = features.fillna(0)
