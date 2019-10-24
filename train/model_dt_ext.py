@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier
 
@@ -22,7 +21,7 @@ class DecisionTreeExtClassifier:
         for idx in range(self.max_round):
             if idx == self.max_round - 1:
                 if idx == 0:
-                    fit_list.append(self.model.fit(full_x, full_y))
+                    fit_list.append(DecisionTreeClassifier(*self.args, **self.kwargs).fit(full_x, full_y))
                 else:
                     fit_list.append(fit_list[0])
                 ext_len = rest
@@ -42,10 +41,7 @@ class DecisionTreeExtClassifier:
                 cut_len = round(rest * self.p_value)
                 df_cut_ext = df_ext.iloc[: cut_len]
                 u_value = df_cut_ext.iloc[-1].criterion
-
-                df_rest_ext = df_ext.iloc[cut_len:]
-                df_rest_ext = df_rest_ext[df_rest_ext.criterion == u_value]
-                df_cut_ext = pd.concat([df_cut_ext, df_rest_ext])
+                df_cut_ext = df_cut_ext[df_cut_ext.criterion < u_value]
 
                 x = x.drop(df_cut_ext.index).reset_index(drop=True)
                 y = y.drop(df_cut_ext.index).reset_index(drop=True)
@@ -72,7 +68,7 @@ class DecisionTreeExtModel:
             pred = model.predict_proba(x)
             df_pred = pd.DataFrame(pred)
             df_pred.columns = ['false', 'true']
-            meet = (df_pred.true * df_pred.false <= u_value)
+            meet = (df_pred.true * df_pred.false < u_value)
 
             if idx == 0:
                 final_pred = df_pred.true
