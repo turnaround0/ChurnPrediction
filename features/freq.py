@@ -10,9 +10,9 @@ def getNumQuestions(posts):
 
 # Frequency features 3: ans_ques_ratio
 def getAnsQuesRatio(num_answers, num_questions):
-    # Don't use Laplace Smoothing
-    # If #ans is 0, return 0. If #ques is 0, return NaN
-    return num_answers / num_questions
+    # Use Laplace Smoothing
+    # If #ans and #ques are 0, it should return 1 instead of 0.
+    return (num_answers + 1) / (num_questions + 1)
 
 
 # Frequency features 4: num_posts
