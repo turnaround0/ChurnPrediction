@@ -43,6 +43,7 @@ hot_features = ['in_hot_topic', 'in_ans_hot_topic', 'in_ques_hot_topic']
 hot_features_1 = ['in_hot_topic']
 hot_features_2 = ['in_ans_hot_topic']
 hot_features_3 = ['in_ques_hot_topic']
+hot_features_4 = ['num_answers']
 
 additional_features = {
     'Answering': answering_features,
@@ -53,6 +54,7 @@ additional_features = {
     'Hot_in_hot_topic': hot_features_1,
     'Hot_in_ans_hot_topic': hot_features_2,
     'Hot_in_ques_hot_topic': hot_features_3,
+    'Hot_num_answers': hot_features_4,
 }
 
 train_seed = 1234
