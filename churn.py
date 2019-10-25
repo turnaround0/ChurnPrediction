@@ -79,7 +79,11 @@ def main():
 
     apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
+    # Store analysis of features
     print_stats(list_of_K, list_of_T, features_of_task1, features_of_task2)
+
+    analysis_features.plot_feature_table_of_task1(list_of_K, features_of_task1)
+    analysis_features.plot_feature_table_of_task2(list_of_T, features_of_task2)
 
     # Training and measure performance on each task
     train.random_init()
