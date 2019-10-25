@@ -177,12 +177,14 @@ def restore_features(list_of_K, list_of_T, file_type='csv'):
             features_of_task1[K] = pd.read_csv('output/features/task1_{}posts_features.csv'.format(K))
         else:
             features_of_task1[K] = pd.read_pickle('output/features/task1_{}posts_features.pkl'.format(K))
+        features_of_task1[K] = features_of_task1[K].set_index('Id')
 
     for T in list_of_T:
         if file_type == 'csv':
             features_of_task2[T] = pd.read_csv('output/features/task2_{}days_features.csv'.format(T))
         else:
             features_of_task2[T] = pd.read_pickle('output/features/task2_{}days_features.pkl'.format(T))
+        features_of_task2[T] = features_of_task2[T].set_index('Id')
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
