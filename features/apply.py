@@ -349,7 +349,10 @@ def hot_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of
 
     for T in list_of_T:
         users, posts = users_of_task2[T], posts_of_task2[T]
-        features_of_task2[T]['in_hot_topic'] = hot.getNumInHotTopic(posts)
+        questions, qna = hot.prepareTask2(posts)
+        features_of_task2[T]['in_ans_hot_topic'] = hot.getNumAnswersInHotTopic(qna)
+        features_of_task2[T]['in_ques_hot_topic'] = hot.getNumQuestionsInHotTopic(questions)
+        features_of_task2[T]['in_hot_topic'] = hot.getNumInHotTopic(questions, qna)
 
     end_time = time.time()
     print('Processing time:', round(end_time - start_time, 8), 's')
