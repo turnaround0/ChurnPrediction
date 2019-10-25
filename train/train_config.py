@@ -39,7 +39,10 @@ answering_features_1 = ['num_of_ans_count']
 answering_features_2 = ['first_post_type']
 answering_features_3 = ['total_comment']
 
-hot_features = ['in_hot_topic']
+hot_features = ['in_hot_topic', 'in_ans_hot_topic', 'in_ques_hot_topic']
+hot_features_1 = ['in_hot_topic']
+hot_features_2 = ['in_ans_hot_topic']
+hot_features_3 = ['in_ques_hot_topic']
 
 additional_features = {
     'Answering': answering_features,
@@ -47,6 +50,9 @@ additional_features = {
     'Answering_first_post_type': answering_features_2,
     'Answering_total_comment': answering_features_3,
     'Hot': hot_features,
+    'Hot_in_hot_topic': hot_features_1,
+    'Hot_in_ans_hot_topic': hot_features_2,
+    'Hot_in_ques_hot_topic': hot_features_3,
 }
 
 train_seed = 1234
