@@ -142,7 +142,7 @@ def plot_figure4(list_of_K, features_of_task1, is_display=False):
 def plot_feature_table_of_task1(list_of_K, features_of_task1):
     for K in list_of_K:
         task1_group = features_of_task1[K].groupby('is_churn')
-        group_mean = task1_group.mean().drop(['Id'], axis=1)
+        group_mean = task1_group.mean()
         group_norm = group_mean / group_mean.max()
         group_norm.to_csv('output/features_table_task1_{}.csv'.format(K))
 
@@ -150,6 +150,6 @@ def plot_feature_table_of_task1(list_of_K, features_of_task1):
 def plot_feature_table_of_task2(list_of_T, features_of_task2):
     for T in list_of_T:
         task2_group = features_of_task2[T].groupby('is_churn')
-        group_mean = task2_group.mean().drop(['Id'], axis=1)
+        group_mean = task2_group.mean()
         group_norm = group_mean / group_mean.max()
         group_norm.to_csv('output/features_table_task2_{}.csv'.format(T))
