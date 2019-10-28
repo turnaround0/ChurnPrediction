@@ -64,11 +64,15 @@ class DecisionTreeExtModel:
         meet_list = []
         final_pred = None
         rest = len(x)
+        stored_pred = []
+        stored_criterion = []
+
         for idx, (model, u_value) in enumerate(self.obj):
             pred = model.predict_proba(x)
             df_pred = pd.DataFrame(pred)
             df_pred.columns = ['false', 'true']
-            meet = (df_pred.true * df_pred.false < u_value)
+            criterion = df_pred.true * df_pred.false
+            meet = (criterion < u_value)
 
             if idx == 0:
                 final_pred = df_pred.true
@@ -77,12 +81,18 @@ class DecisionTreeExtModel:
                 for prev_idx in range(idx):
                     prev_meet = meet_list[prev_idx]
                     meet[prev_meet] = False
-                final_pred[meet] = df_pred.true[meet]
+
+                final_pred[meet] = df_pred.true
+                for prev_idx in range(idx):
+                    final_pred[meet & (criterion > stored_criterion[prev_idx])] = stored_pred[prev_idx].true
+                    criterion[meet & (criterion > stored_criterion[prev_idx])] = stored_criterion[prev_idx]
 
             meet_list.append(meet)
             if idx == self.max_round - 1:
                 rest = 0
             else:
+                stored_pred.append(df_pred)
+                stored_criterion.append(criterion)
                 rest -= meet.sum()
             # print('Prediction) Round, u value, rest, meet count:', idx, u_value, rest, meet.sum())
 
