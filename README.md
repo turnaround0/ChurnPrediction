@@ -14,7 +14,9 @@ $ python churn.py -s full
 -s option gives type of dataset. (tiny, small, full)<br>
 path: dataset/tiny/, dataset/small/, dataset/full/ <br>
 In case of full dataset,<br>
-you can use Users_reduce.pkl and Posts_reduce.pkl.
+you can use users_reduce.pkl and posts_reduce.pkl.<br>
+If you want to use them, please put them on dataset/full path.
+
 
 After reading xml files, this program will convert them to pkl files.<br>
 Result: Users.pkl, Posts.pkl<br>
