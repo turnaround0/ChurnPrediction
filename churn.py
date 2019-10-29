@@ -70,24 +70,23 @@ def main():
         apply.content_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
 
         # Additional features
-        apply.answering_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1, posts_df)
-        apply.answering_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+        # apply.answering_features_of_task1(list_of_K, features_of_task1, users_of_task1, posts_of_task1, posts_df)
+        # apply.answering_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
+        # apply.hot_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
 
-        apply.hot_features_of_task2(list_of_T, features_of_task2, users_of_task2, posts_of_task2)
-
+        # Store data after handling NaN
+        apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
         store_features(list_of_K, list_of_T, features_of_task1, features_of_task2)
 
-    apply.fill_nan(list_of_K, list_of_T, features_of_task1, features_of_task2)
-
-    # Store analysis of features
-    print_stats(list_of_K, list_of_T, features_of_task1, features_of_task2)
-
-    analysis_features.plot_feature_table_of_task1(list_of_K, features_of_task1)
-    analysis_features.plot_feature_table_of_task2(list_of_T, features_of_task2)
+        # Store analysis of features
+        print_stats(list_of_K, list_of_T, features_of_task1, features_of_task2)
+        analysis_features.plot_feature_table_of_task1(list_of_K, features_of_task1)
+        analysis_features.plot_feature_table_of_task2(list_of_T, features_of_task2)
 
     # Training and measure performance on each task
     train.random_init()
 
+    # Test table 2 and 3
     acc_models, stats_models = train.performance_on_task1(list_of_K, features_of_task1)
     analysis_train.plot_table2(list_of_K, acc_models)
     analysis_train.plot_stats_f1_score_table2(list_of_K, stats_models)
@@ -98,6 +97,7 @@ def main():
     analysis_train.plot_stats_f1_score_table3(list_of_T, stats_models)
     analysis_train.plot_stats_table3(list_of_T, stats_models)
 
+    # Test figure 5
     task1_accuracy_of_category = train.measure_task1_accuracy_of_category(list_of_K, features_of_task1)
     analysis_train.plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
     analysis_train.plot_multi_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
@@ -107,11 +107,11 @@ def main():
     analysis_train.plot_multi_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
 
     # Additional feature tests
-    task1_accuracy_of_category = train.measure_task1_additional_features(list_of_K, features_of_task1)
-    analysis_train.plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
-
-    task2_accuracy_of_category = train.measure_task2_additional_features(list_of_T, features_of_task2)
-    analysis_train.plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
+    # task1_accuracy_of_category = train.measure_task1_additional_features(list_of_K, features_of_task1)
+    # analysis_train.plot_figure5_of_task1(list_of_K, task1_accuracy_of_category, args.d)
+    #
+    # task2_accuracy_of_category = train.measure_task2_additional_features(list_of_T, features_of_task2)
+    # analysis_train.plot_figure5_of_task2(list_of_T, task2_accuracy_of_category, args.d)
 
     # Training and measure performance on each feature
     task1_accuracy_with_time_gap = train.performance_on_temporal(list_of_K, features_of_task1)
