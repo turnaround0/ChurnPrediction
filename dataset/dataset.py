@@ -104,7 +104,7 @@ def load_dataset(dataset_type):
 
     for dataset_name in dataset_names:
         pkl_file_path = data_path + dataset_name + '.pkl'
-        pkl_file_reduce_path = data_path + dataset_name + '_reduce.pkl'
+        pkl_file_reduce_path = data_path + dataset_name.lower() + '_reduce.pkl'
 
         if os.path.exists(pkl_file_path):
             df = load_from_pkl(pkl_file_path)
