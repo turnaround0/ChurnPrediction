@@ -41,8 +41,19 @@ def getFirstPostTypeIsAnswer(posts):
     tmp = tmp.set_index('OwnerUserId')
     return posts[posts.OwnerUserId.isin(tmp.index)].PostTypeId.apply(lambda post_type: 1 if post_type == 2 else 0)
 
+# Quality features 1: score of first_post
+def getScoreOfFisrtPost(posts):
+    tmp = posts[posts['ith'] == 1]['OwnerUserId'].to_frame()
+    tmp = tmp.set_index('OwnerUserId')
+    return  posts[posts['OwnerUserId'].isin(tmp.index)]['Score']
 
 # Answering features 1: Total # of comment
 def getTotalNumOfComments(tqna):
     tqna['total_comment'] = tqna.CommentCountA + tqna.CommentCountQ / tqna.AnswerCount
     return tqna.groupby('QuestionUserId').total_comment.sum()
+
+# Competitiveness features 1: answer speed rank
+def getAnsSpeedRank(answers, questions):
+    tmp_rank = answers.groupby('ParentId')['CreationDate'].rank(method='first')
+    answers_rank = questions.set_index('Id').join(tmp_rank, how='inner', rsuffix='R')
+    return answers_rank.groupby('OwnerUserId')['CreationDateR'].mean()
